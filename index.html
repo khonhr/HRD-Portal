@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full bg-slate-50">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HRD Executive Training & Competency Portal</title>
+  
+  <!-- Google Fonts: Prompt & Sarabun -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Sarabun', 'sans-serif'],
+            heading: ['Prompt', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f4f9',
+              100: '#d9e2ec',
+              500: '#102a43',
+              600: '#0b69a3',
+              700: '#035388',
+              800: '#014361',
+              900: '#002147',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="h-full font-sans text-slate-800 antialiased bg-slate-50 flex">
+
+  <!-- LEFT SIDEBAR NAVIGATION -->
+  <aside class="w-64 bg-brand-900 text-white flex flex-col justify-between shrink-0 shadow-xl z-20 min-h-screen">
+    <div>
+      <div class="p-5 border-b border-slate-800 flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-300 font-heading font-bold text-lg shadow-inner">
+          HRD
+        </div>
+        <div>
+          <h1 class="font-heading font-bold text-base leading-tight text-white tracking-wide">HRD Portal</h1>
+          <p class="text-[11px] text-blue-300">Enterprise Analytics</p>
+        </div>
+      </div>
+
+      <nav class="p-4 space-y-1.5 font-heading text-xs">
+        <div class="px-3 py-2 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">เมนูหลัก (MAIN NAVIGATION)</div>
+        
+        <button onclick="switchTab('logs')" id="menu-logs" class="w-full flex items-center justify-between px-3.5 py-3 rounded-xl transition bg-blue-600 text-white font-medium shadow-md">
+          <div class="flex items-center space-x-3">
+            <i class="fa-solid fa-list-check text-base"></i>
+            <span>ประวัติอบรม (Logs)</span>
+          </div>
+          <span id="badge-logs" class="bg-blue-800/80 text-blue-200 px-2 py-0.5 rounded-full text-[10px]">0</span>
+        </button>
+
+        <button onclick="switchTab('certs')" id="menu-certs" class="w-full flex items-center justify-between px-3.5 py-3 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white font-medium">
+          <div class="flex items-center space-x-3">
+            <i class="fa-solid fa-award text-base text-amber-400"></i>
+            <span>ผู้ผ่านการรับรอง (Certs)</span>
+          </div>
+          <span id="badge-certs" class="bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full text-[10px]">0</span>
+        </button>
+
+        <button onclick="switchTab('employees')" id="menu-employees" class="w-full flex items-center justify-between px-3.5 py-3 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white font-medium">
+          <div class="flex items-center space-x-3">
+            <i class="fa-solid fa-users text-base text-emerald-400"></i>
+            <span>ข้อมูลรายบุคคล</span>
+          </div>
+          <span id="badge-employees" class="bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full text-[10px]">0</span>
+        </button>
+      </nav>
+    </div>
+
+    <div class="p-4 border-t border-slate-800/80 bg-slate-950/40 text-[11px] text-slate-400 space-y-2">
+      <div class="flex justify-between items-center">
+        <span>ปีงบประมาณ:</span>
+        <span class="font-bold text-slate-200" id="info-target-year">2027</span>
+      </div>
+      <div class="flex justify-between items-center">
+        <span>แหล่งข้อมูล:</span>
+        <span class="text-emerald-400 flex items-center"><i class="fa-solid fa-circle text-[8px] mr-1"></i> Google Sheet</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- RIGHT MAIN CONTENT AREA -->
+  <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+    
+    <header class="bg-white border-b border-slate-200/80 px-6 py-4 flex items-center justify-between sticky top-0 z-10 shadow-sm">
+      <div>
+        <h2 class="font-heading font-bold text-xl text-slate-800" id="page-title">ประวัติการเข้ารับการฝึกอบรม (Training Action Plan Logs)</h2>
+        <p class="text-xs text-slate-500 mt-0.5" id="page-subtitle">ระบบติดตามการฝึกอบรมพนักงานและคุณวุฒิฝีมือแรงงาน</p>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <button onclick="exportToCSV()" class="inline-flex items-center px-3 py-2 border border-slate-300 rounded-lg text-xs font-medium text-slate-700 bg-white hover:bg-slate-50 transition shadow-sm">
+          <i class="fa-solid fa-file-excel text-emerald-600 mr-2"></i> ส่งออก CSV
+        </button>
+        <button onclick="loadData()" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-medium transition shadow-md active:scale-95">
+          <i class="fa-solid fa-arrows-rotate mr-2" id="refresh-icon"></i> รีเฟรชข้อมูล Live
+        </button>
+      </div>
+    </header>
+
+    <main class="p-6 space-y-6">
+
+      <!-- 🎯 SECTION: VISUAL สรุปสัดส่วนเป้าหมายตาม Dynamic Google Sheet Data -->
+      <div class="bg-gradient-to-r from-slate-900 to-brand-900 rounded-2xl p-6 text-white shadow-lg border border-slate-700/50">
+        <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
+          
+          <div class="space-y-2 text-center lg:text-left max-w-lg">
+            <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-400/30">
+              <i class="fa-solid fa-scale-balanced mr-1.5"></i> เป้าหมายตาม พรบ. ส่งเสริมการพัฒนาฝีมือแรงงาน (<span id="target-pct-label">≥ 50%</span>)
+            </div>
+            <h3 class="text-xl font-heading font-bold text-white leading-tight">
+              สัดส่วนการได้รับการรับรองพนักงานประจำปี <span id="visual-year">2027</span>
+            </h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              ตามกฎหมายกำหนดให้บริษัทส่งฝึกอบรมและได้รับการรับรองจากกรมพัฒนาฝีมือแรงงานไม่น้อยกว่า 50% ของจำนวนพนักงานทั้งหมดในแต่ละช่วงเวลา
+            </p>
+          </div>
+
+          <!-- Circle Ring Progress Visual -->
+          <div class="flex items-center space-x-6 bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10">
+            <div class="relative w-24 h-24 flex items-center justify-center">
+              <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                <path class="text-slate-700" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path id="circle-progress" class="text-amber-400 transition-all duration-1000 ease-out" stroke-dasharray="0, 100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              </svg>
+              <div class="absolute text-center">
+                <span id="visual-pct-text" class="text-xl font-heading font-bold text-white block">0%</span>
+                <span class="text-[9px] text-slate-300 uppercase tracking-widest block">ของทั้งหมด</span>
+              </div>
+            </div>
+
+            <div class="space-y-1.5 text-xs border-l border-white/10 pl-5">
+              <div>
+                <span class="text-slate-300 block text-[11px]">พนักงานรับรองแล้ว:</span>
+                <span id="visual-approved-count" class="text-lg font-bold text-emerald-400">0 คน</span>
+              </div>
+              <div>
+                <span class="text-slate-300 block text-[11px]">พนักงานทั้งหมดองค์กร:</span>
+                <span id="visual-total-company" class="font-bold text-white">0 คน</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Target Card -->
+          <div class="w-full lg:w-72 bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10 space-y-3">
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-slate-300">เป้าหมายขั้นต่ำ:</span>
+              <span id="visual-target-count" class="font-bold text-amber-300">0 คน</span>
+            </div>
+
+            <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden p-0.5">
+              <div id="visual-bar-fill" class="bg-gradient-to-r from-amber-400 to-emerald-400 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+            </div>
+
+            <div class="flex justify-between items-center text-[11px]">
+              <span class="text-slate-300">สถานะตามเป้าหมาย:</span>
+              <span id="visual-target-status" class="font-bold text-amber-400">กำลังคำนวณ...</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Executive KPI Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm flex justify-between items-center">
+          <div>
+            <p class="text-xs font-medium text-slate-400">พนักงานรับรองแล้ว</p>
+            <h3 class="text-2xl font-heading font-bold text-emerald-600 mt-1" id="kpi-total-emp">0</h3>
+            <p class="text-[11px] text-slate-500 mt-1"><i class="fa-solid fa-users text-blue-600 mr-1"></i>จากทั้งหมด <span id="kpi-total-company-sub">0</span> คน</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 text-xl">
+            <i class="fa-solid fa-user-check"></i>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm flex justify-between items-center">
+          <div>
+            <p class="text-xs font-medium text-slate-400">ประวัติการฝึกอบรม</p>
+            <h3 class="text-2xl font-heading font-bold text-slate-800 mt-1" id="kpi-total-logs">0</h3>
+            <p class="text-[11px] text-emerald-600 mt-1"><i class="fa-solid fa-book-open mr-1"></i>รายการอบรมปี <span id="kpi-year-sub">2027</span></p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 text-xl">
+            <i class="fa-solid fa-graduation-cap"></i>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm flex justify-between items-center">
+          <div>
+            <p class="text-xs font-medium text-slate-400">หลักสูตรในระบบ</p>
+            <h3 class="text-2xl font-heading font-bold text-slate-800 mt-1" id="kpi-total-courses">0</h3>
+            <p class="text-[11px] text-purple-600 mt-1"><i class="fa-solid fa-layer-group mr-1"></i>วิชาพัฒนาบุคลากร</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 text-xl">
+            <i class="fa-solid fa-certificate"></i>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm flex justify-between items-center">
+          <div>
+            <p class="text-xs font-medium text-slate-400">สัดส่วนความสำเร็จ</p>
+            <h3 class="text-2xl font-heading font-bold text-amber-500 mt-1" id="kpi-total-certs">0%</h3>
+            <p class="text-[11px] text-amber-600 mt-1"><i class="fa-solid fa-award mr-1"></i>เป้าหมายตามกฎหมาย 50%</p>
+          </div>
+          <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 text-xl">
+            <i class="fa-solid fa-award"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Board / Table Area -->
+      <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <div class="p-5 border-b border-slate-200 bg-slate-50/50 space-y-4">
+          <div class="flex items-center justify-between">
+            <h4 class="font-heading font-semibold text-xs text-slate-700 flex items-center">
+              <i class="fa-solid fa-filter text-blue-600 mr-2"></i> ค้นหาและกรองข้อมูล (MULTI-CRITERIA FILTERS)
+            </h4>
+            <span class="text-xs text-slate-500">พบทั้งหมด <span id="showing-count" class="font-bold text-slate-800">0</span> รายการ</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            <div class="relative">
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+              <input type="text" id="search-input" oninput="applyFilters()" placeholder="ค้นหาชื่อ, รหัสพนักงาน, วิชา..." class="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+            </div>
+
+            <div>
+              <select id="filter-dept" onchange="applyFilters()" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+                <option value="">-- ทุกแผนก/ฝ่าย --</option>
+              </select>
+            </div>
+
+            <div>
+              <select id="filter-position" onchange="applyFilters()" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+                <option value="">-- ทุกตำแหน่งงาน --</option>
+              </select>
+            </div>
+
+            <div id="wrapper-filter-course">
+              <select id="filter-course" onchange="applyFilters()" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+                <option value="">-- ทุกหลักสูตร/วิชา --</option>
+              </select>
+            </div>
+
+            <div id="wrapper-filter-status">
+              <select id="filter-status" onchange="applyFilters()" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+                <option value="">-- สถานะการเข้าร่วมทั้งหมด --</option>
+                <option value="Attend">เข้าร่วม (Attend)</option>
+                <option value="Pass">ผ่านการอบรม (Pass)</option>
+                <option value="Absent">ขาดอบรม (Absent)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto min-h-[380px]">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead id="table-head" class="bg-slate-100/80 text-slate-700 font-heading font-semibold uppercase tracking-wider border-b border-slate-200">
+            </thead>
+            <tbody id="table-body" class="divide-y divide-slate-100 text-slate-700">
+            </tbody>
+          </table>
+        </div>
+
+        <div class="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-xs">
+          <div class="flex items-center space-x-2 text-slate-500">
+            <span>แสดงหน้าละ:</span>
+            <select id="page-size" onchange="changePageSize()" class="bg-white border border-slate-300 rounded px-2 py-1 focus:outline-none">
+              <option value="10">10</option>
+              <option value="25" selected>25</option>
+              <option value="50">50</option>
+            </select>
+            <span>รายการ</span>
+          </div>
+          <div class="flex items-center space-x-1" id="pagination-controls"></div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbysZhLhLNMb5Yd1FxmCnch7clHQBRqpFzUOdTJgh5xbgqmQ0L3hkDdDPKtLNqOchO8W/exec";
+
+    let rawData = { employees: [], courses: [], logs: [], companyTarget: [] };
+    let filteredData = [];
+    let currentTab = 'logs';
+    let currentPage = 1;
+    let pageSize = 25;
+
+    let empMap = {};
+    let courseMap = {};
+
+    async function loadData() {
+      const icon = document.getElementById("refresh-icon");
+      if (icon) icon.classList.add("fa-spin");
+      
+      showLoadingState();
+
+      try {
+        const res = await fetch(API_URL);
+        const data = await res.json();
+        
+        rawData = data;
+        processDataMaps();
+        populateFilterOptions();
+        updateKPIs();
+        applyFilters();
+
+      } catch (err) {
+        console.error("Fetch API Error:", err);
+        showErrorState();
+      } finally {
+        if (icon) icon.classList.remove("fa-spin");
+      }
+    }
+
+    function processDataMaps() {
+      empMap = {};
+      courseMap = {};
+
+      if (rawData.employees) {
+        rawData.employees.forEach(e => { empMap[e.Employee_ID] = e; });
+      }
+      if (rawData.courses) {
+        rawData.courses.forEach(c => { courseMap[c.Course_ID] = c; });
+      }
+    }
+
+    function isLogApproved(l) {
+      const cs = String(l.Cert_Status || '').toLowerCase().trim();
+      if (cs.includes('approved') || cs.includes('รับรองแล้ว') || cs.includes('ผ่านการรับรอง')) {
+        return true;
+      }
+      if (l.Cert_PDF_URL && String(l.Cert_PDF_URL).trim() !== '') {
+        return true;
+      }
+      return false;
+    }
+
+    function updateKPIs() {
+      const logCount = (rawData.logs || []).length;
+      const courseCount = (rawData.courses || []).length;
+
+      // 🎯 ดึงข้อมูลพนักงานทั้งหมดและเป้าหมายจากแท็บ Company_Target แบบ Dynamic
+      let totalCompanyEmployees = 1200; // ค่าเริ่มต้นถ้าไม่พบใน Sheet
+      let targetYear = 2027;
+      let targetCountFromSheet = 0;
+
+      if (rawData.companyTarget && rawData.companyTarget.length > 0) {
+        const targetRow = rawData.companyTarget[0];
+        if (targetRow.Total_Employees) totalCompanyEmployees = parseInt(targetRow.Total_Employees) || 1200;
+        if (targetRow.Target_Year) targetYear = targetRow.Target_Year;
+        if (targetRow.Mandatory_Target_Count) targetCountFromSheet = parseInt(targetRow.Mandatory_Target_Count) || 0;
+      }
+
+      // คำนวณเป้าหมาย 50% ขั้นต่ำ (หากใน Sheet ตั้งค่าไว้น้อยกว่า 50% ให้คำนวณจาก 50% อัตโนมัติ)
+      const minRequiredTarget = Math.ceil(totalCompanyEmployees * 0.5);
+      const finalTargetCount = targetCountFromSheet > 0 ? targetCountFromSheet : minRequiredTarget;
+
+      // คำนวณพนักงาน Unique ที่ได้รับการรับรองแล้ว
+      const approvedEmpSet = new Set();
+      (rawData.logs || []).forEach(l => {
+        if (isLogApproved(l)) {
+          approvedEmpSet.add(l.Employee_ID);
+        }
+      });
+
+      const approvedCount = approvedEmpSet.size;
+      const passPct = totalCompanyEmployees > 0 ? ((approvedCount / totalCompanyEmployees) * 100).toFixed(1) : 0;
+
+      // อัปเดตการแสดงผล KPI Cards
+      document.getElementById('kpi-total-emp').innerText = approvedCount.toLocaleString();
+      document.getElementById('kpi-total-company-sub').innerText = totalCompanyEmployees.toLocaleString();
+      document.getElementById('kpi-total-logs').innerText = logCount.toLocaleString();
+      document.getElementById('kpi-total-courses').innerText = courseCount.toLocaleString();
+      document.getElementById('kpi-total-certs').innerText = `${passPct}%`;
+      document.getElementById('kpi-year-sub').innerText = targetYear;
+      document.getElementById('info-target-year').innerText = targetYear;
+      document.getElementById('visual-year').innerText = targetYear;
+
+      // อัปเดต Dynamic Visual Banner
+      document.getElementById('visual-approved-count').innerText = `${approvedCount.toLocaleString()} คน`;
+      document.getElementById('visual-total-company').innerText = `${totalCompanyEmployees.toLocaleString()} คน`;
+      document.getElementById('visual-target-count').innerText = `${finalTargetCount.toLocaleString()} คน`;
+      document.getElementById('visual-pct-text').innerText = `${passPct}%`;
+
+      // ปรับขนาดความก้าวหน้า Progress Circle Ring (0-100)
+      const circleProgress = document.getElementById('circle-progress');
+      if (circleProgress) {
+        circleProgress.setAttribute('stroke-dasharray', `${passPct}, 100`);
+        if (parseFloat(passPct) >= 50) {
+          circleProgress.classList.remove('text-amber-400');
+          circleProgress.classList.add('text-emerald-400');
+        } else {
+          circleProgress.classList.remove('text-emerald-400');
+          circleProgress.classList.add('text-amber-400');
+        }
+      }
+
+      // ปรับขนาด Progress Bar
+      const barFill = document.getElementById('visual-bar-fill');
+      if (barFill) {
+        const barPct = finalTargetCount > 0 ? Math.min((approvedCount / finalTargetCount) * 100, 100) : 0;
+        barFill.style.width = `${barPct}%`;
+      }
+
+      // ปรับสถานะข้อความตามเป้าหมายจริง
+      const targetStatus = document.getElementById('visual-target-status');
+      if (approvedCount >= finalTargetCount) {
+        targetStatus.innerText = "🎉 ผ่านเป้าหมายแล้ว";
+        targetStatus.className = "font-bold text-emerald-400";
+      } else {
+        const remaining = finalTargetCount - approvedCount;
+        targetStatus.innerText = `ขาดอีก ${remaining.toLocaleString()} คน`;
+        targetStatus.className = "font-bold text-amber-300";
+      }
+
+      document.getElementById('badge-logs').innerText = logCount;
+      document.getElementById('badge-certs').innerText = approvedCount;
+      document.getElementById('badge-employees').innerText = (rawData.employees || []).length;
+    }
+
+    function populateFilterOptions() {
+      const depts = new Set();
+      const positions = new Set();
+
+      (rawData.employees || []).forEach(e => {
+        if (e.Department) depts.add(e.Department);
+        if (e.Position) positions.add(e.Position);
+      });
+
+      const deptSelect = document.getElementById('filter-dept');
+      deptSelect.innerHTML = '<option value="">-- ทุกแผนก/ฝ่าย --</option>';
+      Array.from(depts).sort().forEach(d => {
+        deptSelect.innerHTML += `<option value="${d}">${d}</option>`;
+      });
+
+      const posSelect = document.getElementById('filter-position');
+      posSelect.innerHTML = '<option value="">-- ทุกตำแหน่งงาน --</option>';
+      Array.from(positions).sort().forEach(p => {
+        posSelect.innerHTML += `<option value="${p}">${p}</option>`;
+      });
+
+      const courseSelect = document.getElementById('filter-course');
+      courseSelect.innerHTML = '<option value="">-- ทุกหลักสูตร/วิชา --</option>';
+      (rawData.courses || []).forEach(c => {
+        const cName = c.Course_Name || c.Course_ID;
+        courseSelect.innerHTML += `<option value="${c.Course_ID}">${cName}</option>`;
+      });
+    }
+
+    function applyFilters() {
+      const search = document.getElementById('search-input').value.toLowerCase().trim();
+      const dept = document.getElementById('filter-dept').value;
+      const pos = document.getElementById('filter-position').value;
+      const selectedCourse = document.getElementById('filter-course').value;
+      const status = document.getElementById('filter-status').value;
+
+      if (currentTab === 'logs') {
+        filteredData = (rawData.logs || []).filter(log => {
+          const emp = empMap[log.Employee_ID] || {};
+          const course = courseMap[log.Course_ID] || {};
+          
+          const matchSearch = !search || 
+            String(log.Employee_ID).toLowerCase().includes(search) ||
+            String(emp.First_Name || '').toLowerCase().includes(search) ||
+            String(emp.Last_Name || '').toLowerCase().includes(search) ||
+            String(course.Course_Name || '').toLowerCase().includes(search) ||
+            String(log.Log_ID || '').toLowerCase().includes(search);
+
+          const matchDept = !dept || emp.Department === dept;
+          const matchPos = !pos || emp.Position === pos;
+          const matchCourse = !selectedCourse || String(log.Course_ID) === String(selectedCourse);
+          const matchStatus = !status || String(log.Attendance_Status).toLowerCase() === status.toLowerCase();
+
+          return matchSearch && matchDept && matchPos && matchCourse && matchStatus;
+        });
+
+      } else if (currentTab === 'certs') {
+        filteredData = (rawData.logs || []).filter(log => {
+          const emp = empMap[log.Employee_ID] || {};
+          const course = courseMap[log.Course_ID] || {};
+
+          const matchSearch = !search || 
+            String(log.Employee_ID).toLowerCase().includes(search) ||
+            String(emp.First_Name || '').toLowerCase().includes(search) ||
+            String(emp.Last_Name || '').toLowerCase().includes(search) ||
+            String(course.Course_Name || '').toLowerCase().includes(search);
+
+          const matchDept = !dept || emp.Department === dept;
+          const matchPos = !pos || emp.Position === pos;
+          const matchCourse = !selectedCourse || String(log.Course_ID) === String(selectedCourse);
+
+          return matchSearch && matchDept && matchPos && matchCourse;
+        });
+
+      } else if (currentTab === 'employees') {
+        filteredData = (rawData.employees || []).filter(emp => {
+          const matchSearch = !search || 
+            String(emp.Employee_ID).toLowerCase().includes(search) ||
+            String(emp.First_Name || '').toLowerCase().includes(search) ||
+            String(emp.Last_Name || '').toLowerCase().includes(search) ||
+            String(emp.Department || '').toLowerCase().includes(search);
+
+          const matchDept = !dept || emp.Department === dept;
+          const matchPos = !pos || emp.Position === pos;
+
+          let matchCourse = true;
+          if (selectedCourse) {
+            matchCourse = (rawData.logs || []).some(l => 
+              String(l.Employee_ID) === String(emp.Employee_ID) && String(l.Course_ID) === String(selectedCourse)
+            );
+          }
+
+          return matchSearch && matchDept && matchPos && matchCourse;
+        });
+      }
+
+      currentPage = 1;
+      renderTable();
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      
+      const tabTitles = {
+        logs: { title: "ประวัติการเข้ารับการฝึกอบรม (Training Action Plan Logs)", sub: "ระบบติดตามการฝึกอบรมพนักงานประจำปีงบประมาณ 2027" },
+        certs: { title: "ผู้ผ่านการรับรองหลักสูตร (Certifications / กรมพัฒนาฝีมือแรงงาน)", sub: "ระบบตรวจสอบคุณวุฒิฝีมือแรงงานและเอกสารรับรอง PDF" },
+        employees: { title: "ข้อมูลรายบุคคลพนักงาน (Employee Training Profiles)", sub: "ระบบค้นหาและดูสถิติประวัติการอบรมรายบุคคล" }
+      };
+
+      document.getElementById('page-title').innerText = tabTitles[tab].title;
+      document.getElementById('page-subtitle').innerText = tabTitles[tab].sub;
+
+      ['logs', 'certs', 'employees'].forEach(t => {
+        const btn = document.getElementById(`menu-${t}`);
+        const badge = document.getElementById(`badge-${t}`);
+
+        if (t === tab) {
+          btn.className = "w-full flex items-center justify-between px-3.5 py-3 rounded-xl transition bg-blue-600 text-white font-medium shadow-md";
+          badge.className = "bg-blue-800/80 text-blue-200 px-2 py-0.5 rounded-full text-[10px]";
+        } else {
+          btn.className = "w-full flex items-center justify-between px-3.5 py-3 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white font-medium";
+          badge.className = "bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full text-[10px]";
+        }
+      });
+
+      const statusFilterWrapper = document.getElementById('wrapper-filter-status');
+      if (tab === 'employees') {
+        statusFilterWrapper.classList.add('hidden');
+      } else {
+        statusFilterWrapper.classList.remove('hidden');
+      }
+
+      applyFilters();
+    }
+
+    function renderTable() {
+      document.getElementById('showing-count').innerText = filteredData.length.toLocaleString();
+
+      const thead = document.getElementById('table-head');
+      const tbody = document.getElementById('table-body');
+
+      if (currentTab === 'logs') {
+        thead.innerHTML = `
+          <tr>
+            <th class="p-3.5 pl-5">Log ID</th>
+            <th class="p-3.5">พนักงาน</th>
+            <th class="p-3.5">แผนก / ตำแหน่ง</th>
+            <th class="p-3.5">หลักสูตรการอบรม</th>
+            <th class="p-3.5">วันที่อบรม</th>
+            <th class="p-3.5">สถานะ</th>
+          </tr>
+        `;
+      } else if (currentTab === 'certs') {
+        thead.innerHTML = `
+          <tr>
+            <th class="p-3.5 pl-5">รหัสพนักงาน</th>
+            <th class="p-3.5">ชื่อ-นามสกุล</th>
+            <th class="p-3.5">แผนก/ฝ่าย</th>
+            <th class="p-3.5">หลักสูตรอนุมัติ/รับรอง</th>
+            <th class="p-3.5">ประเภทการรับรอง</th>
+            <th class="p-3.5">สถานะรับรอง</th>
+            <th class="p-3.5 text-center">รายละเอียด / เอกสาร PDF</th>
+          </tr>
+        `;
+      } else if (currentTab === 'employees') {
+        thead.innerHTML = `
+          <tr>
+            <th class="p-3.5 pl-5">รหัสพนักงาน</th>
+            <th class="p-3.5">ชื่อ-นามสกุล</th>
+            <th class="p-3.5">แผนก/ฝ่าย</th>
+            <th class="p-3.5">ตำแหน่งงาน</th>
+            <th class="p-3.5 text-center">ประวัติอบรม</th>
+          </tr>
+        `;
+      }
+
+      const startIdx = (currentPage - 1) * pageSize;
+      const pageData = filteredData.slice(startIdx, startIdx + pageSize);
+
+      if (pageData.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="p-12 text-center text-slate-400">
+              <i class="fa-solid fa-folder-open text-3xl mb-2 block text-slate-300"></i>
+              ไม่พบข้อมูลที่ตรงกับเงื่อนไข
+            </td>
+          </tr>
+        `;
+        renderPaginationControls(0);
+        return;
+      }
+
+      let rowsHTML = '';
+      pageData.forEach(item => {
+        if (currentTab === 'logs') {
+          const emp = empMap[item.Employee_ID] || {};
+          const course = courseMap[item.Course_ID] || {};
+
+          rowsHTML += `
+            <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+              <td class="p-3.5 pl-5 font-semibold text-blue-600">${item.Log_ID || '-'}</td>
+              <td class="p-3.5">
+                <div class="font-medium text-slate-900">${emp.First_Name || ''} ${emp.Last_Name || ''}</div>
+                <div class="text-[11px] text-slate-400">ID: ${item.Employee_ID}</div>
+              </td>
+              <td class="p-3.5">
+                <div>${emp.Department || '-'}</div>
+                <div class="text-[11px] text-slate-400">${emp.Position || '-'}</div>
+              </td>
+              <td class="p-3.5 font-medium text-slate-800">${course.Course_Name || item.Course_ID || '-'}</td>
+              <td class="p-3.5 text-slate-500">${formatDate(item.Start_Date)}</td>
+              <td class="p-3.5">${getStatusBadge(item.Attendance_Status)}</td>
+            </tr>
+          `;
+
+        } else if (currentTab === 'certs') {
+          const emp = empMap[item.Employee_ID] || {};
+          const course = courseMap[item.Course_ID] || {};
+          const pdfUrl = item.Cert_PDF_URL || item.Cert_URL || '';
+          
+          rowsHTML += `
+            <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+              <td class="p-3.5 pl-5 font-semibold text-slate-700">${item.Employee_ID}</td>
+              <td class="p-3.5 font-medium text-slate-900">${emp.First_Name || ''} ${emp.Last_Name || ''}</td>
+              <td class="p-3.5"><span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[11px] font-medium">${emp.Department || '-'}</span></td>
+              <td class="p-3.5 font-medium text-blue-900">${course.Course_Name || item.Course_ID || 'หลักสูตรรับรองมาตรฐาน'}</td>
+              <td class="p-3.5">${getCertCategoryBadge(item.Cert_Category || course.Training_Type)}</td>
+              <td class="p-3.5">${getCertApprovalStatusBadge(item)}</td>
+              <td class="p-3.5 text-center">
+                ${pdfUrl ? `
+                  <a href="${pdfUrl}" target="_blank" class="inline-flex items-center bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-[11px] px-3 py-1.5 rounded-lg shadow-sm transition">
+                    <i class="fa-solid fa-file-pdf mr-1.5"></i> ดาวน์โหลด PDF
+                  </a>
+                ` : `
+                  <span class="text-slate-400 italic text-[11px]">ไม่มีไฟล์แนบ</span>
+                `}
+              </td>
+            </tr>
+          `;
+
+        } else if (currentTab === 'employees') {
+          const logCount = getEmployeeLogCount(item.Employee_ID);
+          rowsHTML += `
+            <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+              <td class="p-3.5 pl-5 font-semibold text-slate-700">${item.Employee_ID}</td>
+              <td class="p-3.5 font-medium text-slate-900">${item.First_Name || ''} ${item.Last_Name || ''}</td>
+              <td class="p-3.5">${item.Department || '-'}</td>
+              <td class="p-3.5">${item.Position || '-'}</td>
+              <td class="p-3.5 text-center">
+                <span class="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full text-[11px] font-medium">
+                  ${logCount} รายการ
+                </span>
+              </td>
+            </tr>
+          `;
+        }
+      });
+
+      tbody.innerHTML = rowsHTML;
+      renderPaginationControls(Math.ceil(filteredData.length / pageSize));
+    }
+
+    function getCertCategoryBadge(cat) {
+      const c = String(cat || '').toLowerCase();
+      if (c.includes('in-house') || c.includes('จัดฝึกอบรม') || c.includes('1')) {
+        return `<span class="bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-1 rounded-lg text-[11px] font-medium"><i class="fa-solid fa-building-user mr-1"></i> จัดฝึกอบรม (In-house)</span>`;
+      } else if (c.includes('public') || c.includes('ส่งฝึกอบรม') || c.includes('2')) {
+        return `<span class="bg-purple-50 text-purple-700 border border-purple-200 px-2.5 py-1 rounded-lg text-[11px] font-medium"><i class="fa-solid fa-paper-plane mr-1"></i> ส่งฝึกอบรม (Public)</span>`;
+      } else if (c.includes('e-learning') || c.includes('ออนไลน์') || c.includes('3')) {
+        return `<span class="bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-1 rounded-lg text-[11px] font-medium"><i class="fa-solid fa-laptop-code mr-1"></i> ออนไลน์ (E-learning)</span>`;
+      }
+      return `<span class="bg-slate-100 text-slate-600 px-2.5 py-1 rounded-lg text-[11px]">${cat || 'จัดฝึกอบรม (In-house)'}</span>`;
+    }
+
+    function getCertApprovalStatusBadge(l) {
+      const statusStr = String(l.Cert_Status || '').toLowerCase().trim();
+
+      if (isLogApproved(l)) {
+        return `<span class="inline-flex items-center bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-full text-[11px] font-medium"><i class="fa-solid fa-circle-check mr-1"></i> รับรองแล้ว</span>`;
+      } else if (statusStr.includes('pending') || statusStr.includes('รอ')) {
+        return `<span class="inline-flex items-center bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-1 rounded-full text-[11px] font-medium"><i class="fa-solid fa-clock mr-1"></i> รอรับรอง</span>`;
+      } else if (statusStr.includes('not') || statusStr.includes('ไม่')) {
+        return `<span class="inline-flex items-center bg-rose-50 text-rose-700 border border-rose-200 px-2.5 py-1 rounded-full text-[11px] font-medium"><i class="fa-solid fa-circle-xmark mr-1"></i> ไม่รับรอง</span>`;
+      }
+      
+      return `<span class="inline-flex items-center bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-1 rounded-full text-[11px] font-medium"><i class="fa-solid fa-clock mr-1"></i> รอรับรอง</span>`;
+    }
+
+    function renderPaginationControls(totalPages) {
+      const container = document.getElementById('pagination-controls');
+      if (totalPages <= 1) {
+        container.innerHTML = '';
+        return;
+      }
+
+      let html = `
+        <button onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} class="px-2 py-1 rounded border border-slate-300 bg-white text-slate-600 disabled:opacity-40">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+      `;
+
+      for (let i = 1; i <= totalPages; i++) {
+        html += `
+          <button onclick="goToPage(${i})" class="px-2.5 py-1 rounded border ${i === currentPage ? 'bg-blue-600 text-white font-bold' : 'bg-white text-slate-600 border-slate-300'}">
+            ${i}
+          </button>
+        `;
+      }
+
+      html += `
+        <button onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} class="px-2 py-1 rounded border border-slate-300 bg-white text-slate-600 disabled:opacity-40">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      `;
+
+      container.innerHTML = html;
+    }
+
+    function goToPage(page) {
+      currentPage = page;
+      renderTable();
+    }
+
+    function changePageSize() {
+      pageSize = parseInt(document.getElementById('page-size').value);
+      currentPage = 1;
+      renderTable();
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '-';
+      const d = new Date(dateStr);
+      if (isNaN(d)) return dateStr;
+      return d.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
+
+    function getStatusBadge(status) {
+      const s = String(status || '').toLowerCase();
+      if (s === 'pass' || s === 'ผ่าน') {
+        return `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full text-[11px] font-medium"><i class="fa-solid fa-check mr-1"></i> ผ่าน</span>`;
+      } else if (s === 'absent' || s === 'ขาด' || s === 'ขาดอบรม' || s === 'absen') {
+        return `<span class="bg-rose-50 text-rose-700 border border-rose-200 px-2 py-0.5 rounded-full text-[11px] font-medium"><i class="fa-solid fa-xmark mr-1"></i> ขาด</span>`;
+      }
+      return `<span class="bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full text-[11px] font-medium"><i class="fa-solid fa-clock mr-1"></i> ${status || 'Attend'}</span>`;
+    }
+
+    function getEmployeeLogCount(empId) {
+      return (rawData.logs || []).filter(l => String(l.Employee_ID) === String(empId)).length;
+    }
+
+    function showLoadingState() {
+      document.getElementById('table-body').innerHTML = `
+        <tr>
+          <td colspan="7" class="p-12 text-center text-slate-400">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-600 border-t-transparent mb-3"></div>
+            <div class="font-medium text-slate-600">กำลังเชื่อมต่อข้อมูล Live Data จาก Google Sheet...</div>
+          </td>
+        </tr>
+      `;
+    }
+
+    function showErrorState() {
+      document.getElementById('table-body').innerHTML = `
+        <tr>
+          <td colspan="7" class="p-10 text-center text-rose-500">
+            <i class="fa-solid fa-triangle-exclamation text-3xl mb-2"></i>
+            <div class="font-bold">ดึงข้อมูลจาก Google Sheet ไม่สำเร็จ</div>
+          </td>
+        </tr>
+      `;
+    }
+
+    function exportToCSV() {
+      if (!filteredData || filteredData.length === 0) {
+        alert("ไม่มีข้อมูลสำหรับส่งออก");
+        return;
+      }
+      let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+      csvContent += "Employee_ID,First_Name,Last_Name,Department,Course,Status\n";
+      filteredData.forEach(l => {
+        const emp = empMap[l.Employee_ID] || {};
+        const course = courseMap[l.Course_ID] || {};
+        csvContent += `"${l.Employee_ID}","${emp.First_Name || ''}","${emp.Last_Name || ''}","${emp.Department || ''}","${course.Course_Name || l.Course_ID || ''}","${l.Attendance_Status || ''}"\n`;
+      });
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `HRD_Report_${currentTab}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadData();
+    });
+  </script>
+</body>
+</html>
