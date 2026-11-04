@@ -2,7 +2,6 @@
 <html lang="th" class="h-full bg-slate-50">
 <head>
   <meta charset="UTF-8">
-  <!-- 🌟 จุดสำคัญ: กำหนดให้ปรับขนาดหน้าจอตามมือถืออัตโนมัติ -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>HRD Executive Training & Competency Portal</title>
   
@@ -42,7 +41,7 @@
 </head>
 <body class="h-full font-sans text-slate-800 antialiased bg-slate-50 flex flex-col md:flex-row">
 
-  <!-- MOBILE TOP BAR (แสดงเฉพาะมือถือ) -->
+  <!-- MOBILE TOP BAR -->
   <div class="md:hidden bg-brand-900 text-white p-4 flex items-center justify-between sticky top-0 z-30 shadow-md">
     <div class="flex items-center space-x-2.5">
       <div class="w-8 h-8 rounded-lg bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-300 font-heading font-bold text-sm">
@@ -58,7 +57,7 @@
     </button>
   </div>
 
-  <!-- LEFT SIDEBAR NAVIGATION (รองรับเมนูสไลด์บนมือถือ) -->
+  <!-- LEFT SIDEBAR NAVIGATION -->
   <aside id="sidebar" class="w-full md:w-64 bg-brand-900 text-white flex flex-col justify-between shrink-0 shadow-xl z-20 hidden md:flex min-h-screen">
     <div>
       <div class="p-5 border-b border-slate-800 hidden md:flex items-center space-x-3">
@@ -100,15 +99,23 @@
       </nav>
     </div>
 
-    <div class="p-4 border-t border-slate-800/80 bg-slate-950/40 text-[11px] text-slate-400 space-y-2">
-      <div class="flex justify-between items-center">
-        <span>ปีงบประมาณ:</span>
-        <span class="font-bold text-slate-200" id="info-target-year">2027</span>
-      </div>
+    <!-- 🌟 ย้ายมาซ้ายล่าง: แหล่งข้อมูล + ปุ่ม CSV + ปุ่ม Manual Refresh -->
+    <div class="p-4 border-t border-slate-800/80 bg-slate-950/40 text-[11px] text-slate-400 space-y-3">
       <div class="flex justify-between items-center">
         <span>แหล่งข้อมูล:</span>
-        <span class="text-emerald-400 flex items-center"><i class="fa-solid fa-circle text-[8px] mr-1"></i> Google Sheet</span>
+        <span class="text-emerald-400 flex items-center font-medium"><i class="fa-solid fa-circle text-[8px] mr-1 animate-pulse"></i> Google Sheet</span>
       </div>
+      
+      <!-- ปุ่ม Manual Refresh และ ปุ่มดาวน์โหลด CSV (ซ้ายล่าง) -->
+      <div class="grid grid-cols-2 gap-2 pt-1">
+        <button onclick="loadData()" class="inline-flex items-center justify-center px-2.5 py-2 bg-blue-600/90 hover:bg-blue-600 text-white rounded-lg text-[11px] font-medium transition shadow active:scale-95">
+          <i class="fa-solid fa-arrows-rotate mr-1.5 text-xs" id="refresh-icon"></i> รีเฟรช
+        </button>
+        <button onclick="exportToCSV()" class="inline-flex items-center justify-center px-2.5 py-2 border border-slate-700 hover:border-slate-500 rounded-lg text-[11px] font-medium text-slate-200 bg-slate-800/80 hover:bg-slate-700 transition shadow">
+          <i class="fa-solid fa-file-excel text-emerald-400 mr-1.5 text-xs"></i> CSV
+        </button>
+      </div>
+      <p class="text-[9px] text-slate-500 text-center pt-0.5"><i class="fa-solid fa-clock mr-1"></i> Auto Refresh ทุก 30 นาที</p>
     </div>
   </aside>
 
@@ -121,19 +128,23 @@
         <p class="text-xs text-slate-500 mt-0.5" id="page-subtitle">ระบบติดตามการฝึกอบรมพนักงานและคุณวุฒิฝีมือแรงงาน</p>
       </div>
 
-      <div class="flex items-center space-x-2 sm:space-x-3">
-        <button onclick="exportToCSV()" class="inline-flex items-center justify-center flex-1 sm:flex-initial px-3 py-2 border border-slate-300 rounded-lg text-xs font-medium text-slate-700 bg-white hover:bg-slate-50 transition shadow-sm">
-          <i class="fa-solid fa-file-excel text-emerald-600 mr-1.5"></i> CSV
-        </button>
-        <button onclick="loadData()" class="inline-flex items-center justify-center flex-1 sm:flex-initial px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-medium transition shadow-md active:scale-95">
-          <i class="fa-solid fa-arrows-rotate mr-1.5" id="refresh-icon"></i> รีเฟรชข้อมูล
-        </button>
+      <!-- 🌟 ย้ายมาขวาบน: แสดงปีงบประมาณ 2027 (2570) -->
+      <div class="flex items-center justify-start sm:justify-end">
+        <div class="bg-slate-100 border border-slate-200 rounded-xl px-3.5 py-2 flex items-center space-x-2.5 shadow-sm">
+          <div class="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-bold shadow-sm">
+            <i class="fa-solid fa-calendar-days"></i>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 block font-medium leading-none">ปีงบประมาณ</span>
+            <span class="text-xs font-bold text-slate-800 font-heading" id="header-fiscal-year">2027 (พ.ศ. 2570)</span>
+          </div>
+        </div>
       </div>
     </header>
 
     <main class="p-4 md:p-6 space-y-6">
 
-      <!-- 🎯 SECTION: VISUAL สรุปสัดส่วนเป้าหมายตาม Dynamic Google Sheet Data -->
+      <!-- SECTION: VISUAL สรุปสัดส่วนเป้าหมาย -->
       <div class="bg-gradient-to-r from-slate-900 to-brand-900 rounded-2xl p-4 md:p-6 text-white shadow-lg border border-slate-700/50">
         <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
           
@@ -142,7 +153,7 @@
               <i class="fa-solid fa-scale-balanced mr-1.5"></i> เป้าหมายตาม พรบ. ส่งเสริมการพัฒนาฝีมือแรงงาน (<span id="target-pct-label">≥ 50%</span>)
             </div>
             <h3 class="text-lg md:text-xl font-heading font-bold text-white leading-tight">
-              สัดส่วนการได้รับการรับรองพนักงานประจำปี <span id="visual-year">2027</span>
+              สัดส่วนการได้รับการรับรองพนักงานประจำปี <span id="visual-year">2027 (พ.ศ. 2570)</span>
             </h3>
             <p class="text-xs text-slate-300 leading-relaxed">
               ตามกฎหมายกำหนดให้บริษัทส่งฝึกอบรมและได้รับการรับรองจากกรมพัฒนาฝีมือแรงงานไม่น้อยกว่า 50% ของจำนวนพนักงานทั้งหมดในแต่ละช่วงเวลา
@@ -418,8 +429,12 @@
       document.getElementById('kpi-total-logs').innerText = logCount.toLocaleString();
       document.getElementById('kpi-total-courses').innerText = courseCount.toLocaleString();
       document.getElementById('kpi-total-certs').innerText = `${passPct}%`;
-      document.getElementById('info-target-year').innerText = targetYear;
-      document.getElementById('visual-year').innerText = targetYear;
+      
+      // อัปเดตปีงบประมาณ 2027 (พ.ศ. 2570)
+      const thYear = parseInt(targetYear) + 543;
+      const yearText = `${targetYear} (พ.ศ. ${thYear})`;
+      document.getElementById('header-fiscal-year').innerText = yearText;
+      document.getElementById('visual-year').innerText = yearText;
 
       document.getElementById('visual-approved-count').innerText = `${approvedCount.toLocaleString()} คน`;
       document.getElementById('visual-total-company').innerText = `${totalCompanyEmployees.toLocaleString()} คน`;
@@ -563,7 +578,7 @@
       currentTab = tab;
       
       const tabTitles = {
-        logs: { title: "ประวัติการเข้ารับการฝึกอบรม (Training Action Plan Logs)", sub: "ระบบติดตามการฝึกอบรมพนักงานประจำปีงบประมาณ 2027" },
+        logs: { title: "ประวัติการเข้ารับการฝึกอบรม (Training Action Plan Logs)", sub: "ระบบติดตามการฝึกอบรมพนักงานประจำปีงบประมาณ 2027 (พ.ศ. 2570)" },
         certs: { title: "ผู้ผ่านการรับรองหลักสูตร (Certifications / กรมพัฒนาฝีมือแรงงาน)", sub: "ระบบตรวจสอบคุณวุฒิฝีมือแรงงานและเอกสารรับรอง PDF" },
         employees: { title: "ข้อมูลรายบุคคลพนักงาน (Employee Training Profiles)", sub: "ระบบค้นหาและดูสถิติประวัติการอบรมรายบุคคล" }
       };
@@ -591,7 +606,6 @@
         statusFilterWrapper.classList.remove('hidden');
       }
 
-      // ซ่อน Sidebar บนมือถือเมื่อกดเลือกแท็บ
       if (window.innerWidth < 768) {
         document.getElementById('sidebar').classList.add('hidden');
         document.getElementById('mobile-menu-icon').className = "fa-solid fa-bars text-lg";
@@ -860,6 +874,12 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       loadData();
+      
+      // 🌟 ระบบ Auto Refresh ดึงข้อมูลใหม่ทุกๆ 30 นาที (1,800,000 มิลลิวินาที)
+      setInterval(() => {
+        console.log("Auto refreshing data...");
+        loadData();
+      }, 1800000);
     });
   </script>
 </body>
