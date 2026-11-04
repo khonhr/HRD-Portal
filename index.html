@@ -2,7 +2,8 @@
 <html lang="th" class="h-full bg-slate-50">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- 🌟 จุดสำคัญ: กำหนดให้ปรับขนาดหน้าจอตามมือถืออัตโนมัติ -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>HRD Executive Training & Competency Portal</title>
   
   <!-- Google Fonts: Prompt & Sarabun -->
@@ -39,12 +40,28 @@
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="h-full font-sans text-slate-800 antialiased bg-slate-50 flex">
+<body class="h-full font-sans text-slate-800 antialiased bg-slate-50 flex flex-col md:flex-row">
 
-  <!-- LEFT SIDEBAR NAVIGATION -->
-  <aside class="w-64 bg-brand-900 text-white flex flex-col justify-between shrink-0 shadow-xl z-20 min-h-screen">
+  <!-- MOBILE TOP BAR (แสดงเฉพาะมือถือ) -->
+  <div class="md:hidden bg-brand-900 text-white p-4 flex items-center justify-between sticky top-0 z-30 shadow-md">
+    <div class="flex items-center space-x-2.5">
+      <div class="w-8 h-8 rounded-lg bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-300 font-heading font-bold text-sm">
+        HRD
+      </div>
+      <div>
+        <h1 class="font-heading font-bold text-sm leading-tight text-white">HRD Portal</h1>
+        <p class="text-[10px] text-blue-300">Enterprise Analytics</p>
+      </div>
+    </div>
+    <button onclick="toggleMobileSidebar()" class="p-2 text-white hover:bg-slate-800 rounded-lg focus:outline-none">
+      <i class="fa-solid fa-bars text-lg" id="mobile-menu-icon"></i>
+    </button>
+  </div>
+
+  <!-- LEFT SIDEBAR NAVIGATION (รองรับเมนูสไลด์บนมือถือ) -->
+  <aside id="sidebar" class="w-full md:w-64 bg-brand-900 text-white flex flex-col justify-between shrink-0 shadow-xl z-20 hidden md:flex min-h-screen">
     <div>
-      <div class="p-5 border-b border-slate-800 flex items-center space-x-3">
+      <div class="p-5 border-b border-slate-800 hidden md:flex items-center space-x-3">
         <div class="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-300 font-heading font-bold text-lg shadow-inner">
           HRD
         </div>
@@ -98,33 +115,33 @@
   <!-- RIGHT MAIN CONTENT AREA -->
   <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
     
-    <header class="bg-white border-b border-slate-200/80 px-6 py-4 flex items-center justify-between sticky top-0 z-10 shadow-sm">
+    <header class="bg-white border-b border-slate-200/80 px-4 md:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sticky top-0 z-10 shadow-sm">
       <div>
-        <h2 class="font-heading font-bold text-xl text-slate-800" id="page-title">ประวัติการเข้ารับการฝึกอบรม (Training Action Plan Logs)</h2>
+        <h2 class="font-heading font-bold text-lg md:text-xl text-slate-800" id="page-title">ประวัติการเข้ารับการฝึกอบรม (Training Action Plan Logs)</h2>
         <p class="text-xs text-slate-500 mt-0.5" id="page-subtitle">ระบบติดตามการฝึกอบรมพนักงานและคุณวุฒิฝีมือแรงงาน</p>
       </div>
 
-      <div class="flex items-center space-x-3">
-        <button onclick="exportToCSV()" class="inline-flex items-center px-3 py-2 border border-slate-300 rounded-lg text-xs font-medium text-slate-700 bg-white hover:bg-slate-50 transition shadow-sm">
-          <i class="fa-solid fa-file-excel text-emerald-600 mr-2"></i> ส่งออก CSV
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <button onclick="exportToCSV()" class="inline-flex items-center justify-center flex-1 sm:flex-initial px-3 py-2 border border-slate-300 rounded-lg text-xs font-medium text-slate-700 bg-white hover:bg-slate-50 transition shadow-sm">
+          <i class="fa-solid fa-file-excel text-emerald-600 mr-1.5"></i> CSV
         </button>
-        <button onclick="loadData()" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-medium transition shadow-md active:scale-95">
-          <i class="fa-solid fa-arrows-rotate mr-2" id="refresh-icon"></i> รีเฟรชข้อมูล Live
+        <button onclick="loadData()" class="inline-flex items-center justify-center flex-1 sm:flex-initial px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-medium transition shadow-md active:scale-95">
+          <i class="fa-solid fa-arrows-rotate mr-1.5" id="refresh-icon"></i> รีเฟรชข้อมูล
         </button>
       </div>
     </header>
 
-    <main class="p-6 space-y-6">
+    <main class="p-4 md:p-6 space-y-6">
 
       <!-- 🎯 SECTION: VISUAL สรุปสัดส่วนเป้าหมายตาม Dynamic Google Sheet Data -->
-      <div class="bg-gradient-to-r from-slate-900 to-brand-900 rounded-2xl p-6 text-white shadow-lg border border-slate-700/50">
+      <div class="bg-gradient-to-r from-slate-900 to-brand-900 rounded-2xl p-4 md:p-6 text-white shadow-lg border border-slate-700/50">
         <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
           
           <div class="space-y-2 text-center lg:text-left max-w-lg">
-            <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-400/30">
+            <div class="inline-flex items-center px-3 py-1 rounded-full text-[11px] md:text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-400/30">
               <i class="fa-solid fa-scale-balanced mr-1.5"></i> เป้าหมายตาม พรบ. ส่งเสริมการพัฒนาฝีมือแรงงาน (<span id="target-pct-label">≥ 50%</span>)
             </div>
-            <h3 class="text-xl font-heading font-bold text-white leading-tight">
+            <h3 class="text-lg md:text-xl font-heading font-bold text-white leading-tight">
               สัดส่วนการได้รับการรับรองพนักงานประจำปี <span id="visual-year">2027</span>
             </h3>
             <p class="text-xs text-slate-300 leading-relaxed">
@@ -133,25 +150,25 @@
           </div>
 
           <!-- Circle Ring Progress Visual -->
-          <div class="flex items-center space-x-6 bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10">
-            <div class="relative w-24 h-24 flex items-center justify-center">
+          <div class="flex flex-row items-center space-x-4 md:space-x-6 bg-white/10 backdrop-blur-md p-3.5 md:p-4 rounded-2xl border border-white/10 w-full sm:w-auto justify-center">
+            <div class="relative w-20 h-20 md:w-24 md:h-24 flex items-center justify-center shrink-0">
               <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                 <path class="text-slate-700" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                 <path id="circle-progress" class="text-amber-400 transition-all duration-1000 ease-out" stroke-dasharray="0, 100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
               </svg>
               <div class="absolute text-center">
-                <span id="visual-pct-text" class="text-xl font-heading font-bold text-white block">0%</span>
-                <span class="text-[9px] text-slate-300 uppercase tracking-widest block">ของทั้งหมด</span>
+                <span id="visual-pct-text" class="text-lg md:text-xl font-heading font-bold text-white block">0%</span>
+                <span class="text-[8px] md:text-[9px] text-slate-300 uppercase tracking-widest block">ของทั้งหมด</span>
               </div>
             </div>
 
-            <div class="space-y-1.5 text-xs border-l border-white/10 pl-5">
+            <div class="space-y-1.5 text-xs border-l border-white/10 pl-4 md:pl-5">
               <div>
-                <span class="text-slate-300 block text-[11px]">พนักงานรับรองแล้ว:</span>
-                <span id="visual-approved-count" class="text-lg font-bold text-emerald-400">0 คน</span>
+                <span class="text-slate-300 block text-[10px] md:text-[11px]">พนักงานรับรองแล้ว:</span>
+                <span id="visual-approved-count" class="text-base md:text-lg font-bold text-emerald-400">0 คน</span>
               </div>
               <div>
-                <span class="text-slate-300 block text-[11px]">พนักงานทั้งหมดองค์กร:</span>
+                <span class="text-slate-300 block text-[10px] md:text-[11px]">พนักงานทั้งหมดองค์กร:</span>
                 <span id="visual-total-company" class="font-bold text-white">0 คน</span>
               </div>
             </div>
@@ -178,47 +195,47 @@
       </div>
 
       <!-- Executive KPI Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm flex justify-between items-center">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+        <div class="bg-white p-4 md:p-5 rounded-xl border border-slate-200/80 shadow-sm flex justify-between items-center">
           <div>
-            <p class="text-xs font-medium text-slate-400">พนักงานรับรองแล้ว</p>
-            <h3 class="text-2xl font-heading font-bold text-emerald-600 mt-1" id="kpi-total-emp">0</h3>
-            <p class="text-[11px] text-slate-500 mt-1"><i class="fa-solid fa-users text-blue-600 mr-1"></i>จากทั้งหมด <span id="kpi-total-company-sub">0</span> คน</p>
+            <p class="text-[11px] md:text-xs font-medium text-slate-400">พนักงานรับรองแล้ว</p>
+            <h3 class="text-xl md:text-2xl font-heading font-bold text-emerald-600 mt-1" id="kpi-total-emp">0</h3>
+            <p class="text-[10px] md:text-[11px] text-slate-500 mt-1"><i class="fa-solid fa-users text-blue-600 mr-1"></i>รวม <span id="kpi-total-company-sub">0</span> คน</p>
           </div>
-          <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 text-xl">
+          <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 text-lg md:text-xl shrink-0">
             <i class="fa-solid fa-user-check"></i>
           </div>
         </div>
 
-        <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm flex justify-between items-center">
+        <div class="bg-white p-4 md:p-5 rounded-xl border border-slate-200/80 shadow-sm flex justify-between items-center">
           <div>
-            <p class="text-xs font-medium text-slate-400">ประวัติการฝึกอบรม</p>
-            <h3 class="text-2xl font-heading font-bold text-slate-800 mt-1" id="kpi-total-logs">0</h3>
-            <p class="text-[11px] text-emerald-600 mt-1"><i class="fa-solid fa-book-open mr-1"></i>รายการอบรมปี <span id="kpi-year-sub">2027</span></p>
+            <p class="text-[11px] md:text-xs font-medium text-slate-400">ประวัติการฝึกอบรม</p>
+            <h3 class="text-xl md:text-2xl font-heading font-bold text-slate-800 mt-1" id="kpi-total-logs">0</h3>
+            <p class="text-[10px] md:text-[11px] text-emerald-600 mt-1"><i class="fa-solid fa-book-open mr-1"></i>รายการอบรม</p>
           </div>
-          <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 text-xl">
+          <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 text-lg md:text-xl shrink-0">
             <i class="fa-solid fa-graduation-cap"></i>
           </div>
         </div>
 
-        <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm flex justify-between items-center">
+        <div class="bg-white p-4 md:p-5 rounded-xl border border-slate-200/80 shadow-sm flex justify-between items-center">
           <div>
-            <p class="text-xs font-medium text-slate-400">หลักสูตรในระบบ</p>
-            <h3 class="text-2xl font-heading font-bold text-slate-800 mt-1" id="kpi-total-courses">0</h3>
-            <p class="text-[11px] text-purple-600 mt-1"><i class="fa-solid fa-layer-group mr-1"></i>วิชาพัฒนาบุคลากร</p>
+            <p class="text-[11px] md:text-xs font-medium text-slate-400">หลักสูตรในระบบ</p>
+            <h3 class="text-xl md:text-2xl font-heading font-bold text-slate-800 mt-1" id="kpi-total-courses">0</h3>
+            <p class="text-[10px] md:text-[11px] text-purple-600 mt-1"><i class="fa-solid fa-layer-group mr-1"></i>วิชาพัฒนาบุคลากร</p>
           </div>
-          <div class="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 text-xl">
+          <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 text-lg md:text-xl shrink-0">
             <i class="fa-solid fa-certificate"></i>
           </div>
         </div>
 
-        <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm flex justify-between items-center">
+        <div class="bg-white p-4 md:p-5 rounded-xl border border-slate-200/80 shadow-sm flex justify-between items-center">
           <div>
-            <p class="text-xs font-medium text-slate-400">สัดส่วนความสำเร็จ</p>
-            <h3 class="text-2xl font-heading font-bold text-amber-500 mt-1" id="kpi-total-certs">0%</h3>
-            <p class="text-[11px] text-amber-600 mt-1"><i class="fa-solid fa-award mr-1"></i>เป้าหมายตามกฎหมาย 50%</p>
+            <p class="text-[11px] md:text-xs font-medium text-slate-400">สัดส่วนความสำเร็จ</p>
+            <h3 class="text-xl md:text-2xl font-heading font-bold text-amber-500 mt-1" id="kpi-total-certs">0%</h3>
+            <p class="text-[10px] md:text-[11px] text-amber-600 mt-1"><i class="fa-solid fa-award mr-1"></i>เป้าหมาย 50%</p>
           </div>
-          <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 text-xl">
+          <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 text-lg md:text-xl shrink-0">
             <i class="fa-solid fa-award"></i>
           </div>
         </div>
@@ -226,15 +243,15 @@
 
       <!-- Main Board / Table Area -->
       <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
-        <div class="p-5 border-b border-slate-200 bg-slate-50/50 space-y-4">
+        <div class="p-4 md:p-5 border-b border-slate-200 bg-slate-50/50 space-y-4">
           <div class="flex items-center justify-between">
             <h4 class="font-heading font-semibold text-xs text-slate-700 flex items-center">
-              <i class="fa-solid fa-filter text-blue-600 mr-2"></i> ค้นหาและกรองข้อมูล (MULTI-CRITERIA FILTERS)
+              <i class="fa-solid fa-filter text-blue-600 mr-2"></i> ตัวกรองข้อมูล
             </h4>
-            <span class="text-xs text-slate-500">พบทั้งหมด <span id="showing-count" class="font-bold text-slate-800">0</span> รายการ</span>
+            <span class="text-xs text-slate-500">พบ <span id="showing-count" class="font-bold text-slate-800">0</span> รายการ</span>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 md:gap-3">
             <div class="relative">
               <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
               <input type="text" id="search-input" oninput="applyFilters()" placeholder="ค้นหาชื่อ, รหัสพนักงาน, วิชา..." class="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
@@ -269,8 +286,8 @@
           </div>
         </div>
 
-        <div class="overflow-x-auto min-h-[380px]">
-          <table class="w-full text-left border-collapse text-xs">
+        <div class="overflow-x-auto min-h-[300px]">
+          <table class="w-full text-left border-collapse text-xs whitespace-nowrap md:whitespace-normal">
             <thead id="table-head" class="bg-slate-100/80 text-slate-700 font-heading font-semibold uppercase tracking-wider border-b border-slate-200">
             </thead>
             <tbody id="table-body" class="divide-y divide-slate-100 text-slate-700">
@@ -278,7 +295,7 @@
           </table>
         </div>
 
-        <div class="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-xs">
+        <div class="p-4 border-t border-slate-200 bg-slate-50 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
           <div class="flex items-center space-x-2 text-slate-500">
             <span>แสดงหน้าละ:</span>
             <select id="page-size" onchange="changePageSize()" class="bg-white border border-slate-300 rounded px-2 py-1 focus:outline-none">
@@ -308,6 +325,18 @@
 
     let empMap = {};
     let courseMap = {};
+
+    function toggleMobileSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const icon = document.getElementById('mobile-menu-icon');
+      if (sidebar.classList.contains('hidden')) {
+        sidebar.classList.remove('hidden');
+        icon.className = "fa-solid fa-xmark text-lg";
+      } else {
+        sidebar.classList.add('hidden');
+        icon.className = "fa-solid fa-bars text-lg";
+      }
+    }
 
     async function loadData() {
       const icon = document.getElementById("refresh-icon");
@@ -360,8 +389,7 @@
       const logCount = (rawData.logs || []).length;
       const courseCount = (rawData.courses || []).length;
 
-      // 🎯 ดึงข้อมูลพนักงานทั้งหมดและเป้าหมายจากแท็บ Company_Target แบบ Dynamic
-      let totalCompanyEmployees = 1200; // ค่าเริ่มต้นถ้าไม่พบใน Sheet
+      let totalCompanyEmployees = 1200;
       let targetYear = 2027;
       let targetCountFromSheet = 0;
 
@@ -372,11 +400,9 @@
         if (targetRow.Mandatory_Target_Count) targetCountFromSheet = parseInt(targetRow.Mandatory_Target_Count) || 0;
       }
 
-      // คำนวณเป้าหมาย 50% ขั้นต่ำ (หากใน Sheet ตั้งค่าไว้น้อยกว่า 50% ให้คำนวณจาก 50% อัตโนมัติ)
       const minRequiredTarget = Math.ceil(totalCompanyEmployees * 0.5);
       const finalTargetCount = targetCountFromSheet > 0 ? targetCountFromSheet : minRequiredTarget;
 
-      // คำนวณพนักงาน Unique ที่ได้รับการรับรองแล้ว
       const approvedEmpSet = new Set();
       (rawData.logs || []).forEach(l => {
         if (isLogApproved(l)) {
@@ -387,23 +413,19 @@
       const approvedCount = approvedEmpSet.size;
       const passPct = totalCompanyEmployees > 0 ? ((approvedCount / totalCompanyEmployees) * 100).toFixed(1) : 0;
 
-      // อัปเดตการแสดงผล KPI Cards
       document.getElementById('kpi-total-emp').innerText = approvedCount.toLocaleString();
       document.getElementById('kpi-total-company-sub').innerText = totalCompanyEmployees.toLocaleString();
       document.getElementById('kpi-total-logs').innerText = logCount.toLocaleString();
       document.getElementById('kpi-total-courses').innerText = courseCount.toLocaleString();
       document.getElementById('kpi-total-certs').innerText = `${passPct}%`;
-      document.getElementById('kpi-year-sub').innerText = targetYear;
       document.getElementById('info-target-year').innerText = targetYear;
       document.getElementById('visual-year').innerText = targetYear;
 
-      // อัปเดต Dynamic Visual Banner
       document.getElementById('visual-approved-count').innerText = `${approvedCount.toLocaleString()} คน`;
       document.getElementById('visual-total-company').innerText = `${totalCompanyEmployees.toLocaleString()} คน`;
       document.getElementById('visual-target-count').innerText = `${finalTargetCount.toLocaleString()} คน`;
       document.getElementById('visual-pct-text').innerText = `${passPct}%`;
 
-      // ปรับขนาดความก้าวหน้า Progress Circle Ring (0-100)
       const circleProgress = document.getElementById('circle-progress');
       if (circleProgress) {
         circleProgress.setAttribute('stroke-dasharray', `${passPct}, 100`);
@@ -416,14 +438,12 @@
         }
       }
 
-      // ปรับขนาด Progress Bar
       const barFill = document.getElementById('visual-bar-fill');
       if (barFill) {
         const barPct = finalTargetCount > 0 ? Math.min((approvedCount / finalTargetCount) * 100, 100) : 0;
         barFill.style.width = `${barPct}%`;
       }
 
-      // ปรับสถานะข้อความตามเป้าหมายจริง
       const targetStatus = document.getElementById('visual-target-status');
       if (approvedCount >= finalTargetCount) {
         targetStatus.innerText = "🎉 ผ่านเป้าหมายแล้ว";
@@ -569,6 +589,12 @@
         statusFilterWrapper.classList.add('hidden');
       } else {
         statusFilterWrapper.classList.remove('hidden');
+      }
+
+      // ซ่อน Sidebar บนมือถือเมื่อกดเลือกแท็บ
+      if (window.innerWidth < 768) {
+        document.getElementById('sidebar').classList.add('hidden');
+        document.getElementById('mobile-menu-icon').className = "fa-solid fa-bars text-lg";
       }
 
       applyFilters();
