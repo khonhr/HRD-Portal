@@ -96,17 +96,25 @@
           </div>
           <span id="badge-employees" class="bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full text-[10px]">0</span>
         </button>
+
+        <!-- 🌟 แท็บใหม่: ปฏิทินยื่นรับรองหลักสูตร -->
+        <button onclick="switchTab('calendar')" id="menu-calendar" class="w-full flex items-center justify-between px-3.5 py-3 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white font-medium">
+          <div class="flex items-center space-x-3">
+            <i class="fa-solid fa-calendar-check text-base text-rose-400"></i>
+            <span>ปฏิทินยื่นรับรอง</span>
+          </div>
+          <span id="badge-calendar" class="bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded-full text-[10px] font-bold border border-rose-500/30">60 วัน</span>
+        </button>
       </nav>
     </div>
 
-    <!-- 🌟 ย้ายมาซ้ายล่าง: แหล่งข้อมูล + ปุ่ม CSV + ปุ่ม Manual Refresh -->
+    <!-- SIDEBAR FOOTER -->
     <div class="p-4 border-t border-slate-800/80 bg-slate-950/40 text-[11px] text-slate-400 space-y-3">
       <div class="flex justify-between items-center">
         <span>แหล่งข้อมูล:</span>
         <span class="text-emerald-400 flex items-center font-medium"><i class="fa-solid fa-circle text-[8px] mr-1 animate-pulse"></i> Google Sheet</span>
       </div>
       
-      <!-- ปุ่ม Manual Refresh และ ปุ่มดาวน์โหลด CSV (ซ้ายล่าง) -->
       <div class="grid grid-cols-2 gap-2 pt-1">
         <button onclick="loadData()" class="inline-flex items-center justify-center px-2.5 py-2 bg-blue-600/90 hover:bg-blue-600 text-white rounded-lg text-[11px] font-medium transition shadow active:scale-95">
           <i class="fa-solid fa-arrows-rotate mr-1.5 text-xs" id="refresh-icon"></i> รีเฟรช
@@ -128,7 +136,6 @@
         <p class="text-xs text-slate-500 mt-0.5" id="page-subtitle">ระบบติดตามการฝึกอบรมพนักงานและคุณวุฒิฝีมือแรงงาน</p>
       </div>
 
-      <!-- 🌟 ย้ายมาขวาบน: แสดงปีงบประมาณ 2027 (2570) -->
       <div class="flex items-center justify-start sm:justify-end">
         <div class="bg-slate-100 border border-slate-200 rounded-xl px-3.5 py-2 flex items-center space-x-2.5 shadow-sm">
           <div class="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-bold shadow-sm">
@@ -144,8 +151,8 @@
 
     <main class="p-4 md:p-6 space-y-6">
 
-      <!-- SECTION: VISUAL สรุปสัดส่วนเป้าหมาย -->
-      <div class="bg-gradient-to-r from-slate-900 to-brand-900 rounded-2xl p-4 md:p-6 text-white shadow-lg border border-slate-700/50">
+      <!-- SECTION: VISUAL สรุปสัดส่วนเป้าหมาย (แสดงในแท็บ Logs, Certs, Employees) -->
+      <div id="visual-summary-banner" class="bg-gradient-to-r from-slate-900 to-brand-900 rounded-2xl p-4 md:p-6 text-white shadow-lg border border-slate-700/50">
         <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
           
           <div class="space-y-2 text-center lg:text-left max-w-lg">
@@ -206,7 +213,7 @@
       </div>
 
       <!-- Executive KPI Cards -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+      <div id="kpi-cards-group" class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         <div class="bg-white p-4 md:p-5 rounded-xl border border-slate-200/80 shadow-sm flex justify-between items-center">
           <div>
             <p class="text-[11px] md:text-xs font-medium text-slate-400">พนักงานรับรองแล้ว</p>
@@ -252,8 +259,8 @@
         </div>
       </div>
 
-      <!-- Main Board / Table Area -->
-      <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+      <!-- Main Board / Table Area (สำหรับ Logs, Certs, Employees) -->
+      <div id="main-table-container" class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
         <div class="p-4 md:p-5 border-b border-slate-200 bg-slate-50/50 space-y-4">
           <div class="flex items-center justify-between">
             <h4 class="font-heading font-semibold text-xs text-slate-700 flex items-center">
@@ -317,6 +324,94 @@
             <span>รายการ</span>
           </div>
           <div class="flex items-center space-x-1" id="pagination-controls"></div>
+        </div>
+      </div>
+
+      <!-- 🌟🌟 PAGE: CALENDAR PAGE DESIGN (แสดงเฉพาะเมื่อสลับไปแท็บ Calendar) 🌟🌟 -->
+      <div id="calendar-view-container" class="hidden space-y-6">
+        
+        <!-- Top Info Alert Banner -->
+        <div class="bg-rose-900/90 text-white rounded-2xl p-5 md:p-6 shadow-lg border border-rose-700/50 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/20 text-rose-200 border border-rose-400/30">
+              <i class="fa-solid fa-triangle-exclamation mr-1.5 text-amber-300"></i> ข้อกำหนดตาม พรบ. ส่งเสริมการพัฒนาฝีมือแรงงาน
+            </div>
+            <h3 class="text-lg md:text-xl font-heading font-bold text-white">กำหนดการยื่นขอรับรองหลักสูตรและค่าใช้จ่าย (ภายใน 60 วัน)</h3>
+            <p class="text-xs text-rose-100 leading-relaxed max-w-3xl">
+              สถานประกอบการต้องยื่นขอรับรองหลักสูตรและค่าใช้จ่ายในการจัดฝึกอบรม **ภายใน 60 วันนับแต่วันที่เสร็จสิ้นการฝึกอบรม** (หากเกินกำหนด จะไม่สามารถนำไปยกเว้นภาษีเงินได้ 200%)
+            </p>
+          </div>
+          <div class="bg-white/10 backdrop-blur-md px-4 py-3 rounded-xl border border-white/10 text-center shrink-0 w-full md:w-auto">
+            <span class="text-[10px] text-rose-200 uppercase block tracking-wider font-semibold">ระยะเวลาทางกฎหมาย</span>
+            <span class="text-2xl font-bold font-heading text-amber-300">60 วัน</span>
+          </div>
+        </div>
+
+        <!-- Section 1: Quick Calculator & Search Lookup Tool -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 md:p-6 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 class="font-heading font-bold text-sm text-slate-800 flex items-center">
+              <i class="fa-solid fa-calculator text-blue-600 mr-2"></i> เครื่องมือคำนวณวันสุดท้ายของการยื่นรับรอง (Deadline Calculator)
+            </h3>
+            <span class="text-xs text-slate-400">คำนวณวันหมดเขตอัตโนมัติ</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end bg-slate-50 p-4 rounded-xl border border-slate-200/60">
+            <div>
+              <label class="block text-xs font-medium text-slate-700 mb-1.5"><i class="fa-solid fa-calendar-day mr-1 text-blue-600"></i> ระบุวันที่จัดฝึกอบรมเสร็จสิ้น:</label>
+              <input type="date" id="calc-train-date" onchange="calculateCustomDeadline()" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm">
+            </div>
+
+            <div>
+              <label class="block text-xs font-medium text-slate-700 mb-1.5"><i class="fa-solid fa-flag-checkered mr-1 text-rose-600"></i> วันสุดท้ายที่ต้องยื่นรับรอง (60 วัน):</label>
+              <div id="calc-result-date" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-rose-600 shadow-inner flex items-center justify-between">
+                <span>-- เลือกวันที่อบรม --</span>
+                <i class="fa-solid fa-clock"></i>
+              </div>
+            </div>
+
+            <div>
+              <div id="calc-status-badge" class="w-full px-3 py-2 bg-slate-200 text-slate-500 rounded-lg text-xs font-medium text-center">
+                กรุณาระบุวันที่เพื่อตรวจสอบ
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: Active Training Logs & Submission Deadline Timeline -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+          <div class="p-4 md:p-5 border-b border-slate-200 bg-slate-50/50 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div>
+              <h3 class="font-heading font-bold text-sm text-slate-800 flex items-center">
+                <i class="fa-solid fa-clock-rotate-left text-amber-500 mr-2"></i> สถานะการนับถอยหลังยื่นรับรองของรายการอบรมปี 2027
+              </h3>
+              <p class="text-xs text-slate-500 mt-0.5">ติดตามรายการที่ต้องรวบรวมเอกสารยื่นกรมพัฒนาฝีมือแรงงาน</p>
+            </div>
+            
+            <div class="flex items-center space-x-2 text-xs">
+              <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-medium text-[11px]"><i class="fa-solid fa-circle text-[8px] mr-1 text-emerald-500"></i> ปกติ (>30 วัน)</span>
+              <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 font-medium text-[11px]"><i class="fa-solid fa-circle text-[8px] mr-1 text-amber-500"></i> ใกล้ครบกำหนด (≤15 วัน)</span>
+              <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-rose-100 text-rose-800 font-medium text-[11px]"><i class="fa-solid fa-circle text-[8px] mr-1 text-rose-500"></i> วิกฤต/เกินกำหนด</span>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto min-h-[250px]">
+            <table class="w-full text-left border-collapse text-xs whitespace-nowrap md:whitespace-normal">
+              <thead class="bg-slate-100/80 text-slate-700 font-heading font-semibold uppercase tracking-wider border-b border-slate-200">
+                <tr>
+                  <th class="p-3.5 pl-5">หลักสูตร / รหัส Log</th>
+                  <th class="p-3.5">วันที่จัดอบรม</th>
+                  <th class="p-3.5">วันสุดท้ายที่ต้องยื่น (60 วัน)</th>
+                  <th class="p-3.5">นับถอยหลัง (Remaining)</th>
+                  <th class="p-3.5">สถานะการยื่นรับรอง</th>
+                  <th class="p-3.5 text-center">การดำเนินการ</th>
+                </tr>
+              </thead>
+              <tbody id="calendar-table-body" class="divide-y divide-slate-100 text-slate-700">
+                <!-- Javascript will render dynamic rows here -->
+              </tbody>
+            </table>
+          </div>
         </div>
 
       </div>
@@ -430,7 +525,6 @@
       document.getElementById('kpi-total-courses').innerText = courseCount.toLocaleString();
       document.getElementById('kpi-total-certs').innerText = `${passPct}%`;
       
-      // อัปเดตปีงบประมาณ 2027 (พ.ศ. 2570)
       const thYear = parseInt(targetYear) + 543;
       const yearText = `${targetYear} (พ.ศ. ${thYear})`;
       document.getElementById('header-fiscal-year').innerText = yearText;
@@ -580,38 +674,56 @@
       const tabTitles = {
         logs: { title: "ประวัติการเข้ารับการฝึกอบรม (Training Action Plan Logs)", sub: "ระบบติดตามการฝึกอบรมพนักงานประจำปีงบประมาณ 2027 (พ.ศ. 2570)" },
         certs: { title: "ผู้ผ่านการรับรองหลักสูตร (Certifications / กรมพัฒนาฝีมือแรงงาน)", sub: "ระบบตรวจสอบคุณวุฒิฝีมือแรงงานและเอกสารรับรอง PDF" },
-        employees: { title: "ข้อมูลรายบุคคลพนักงาน (Employee Training Profiles)", sub: "ระบบค้นหาและดูสถิติประวัติการอบรมรายบุคคล" }
+        employees: { title: "ข้อมูลรายบุคคลพนักงาน (Employee Training Profiles)", sub: "ระบบค้นหาและดูสถิติประวัติการอบรมรายบุคคล" },
+        calendar: { title: "ปฏิทินยื่นขอรับรองหลักสูตร 60 วัน (Submission Deadline Calendar)", sub: "ระบบคำนวณและติดตามวันหมดเขตรวบรวมเอกสารยื่นยื่นกรมพัฒนาฝีมือแรงงาน" }
       };
 
       document.getElementById('page-title').innerText = tabTitles[tab].title;
       document.getElementById('page-subtitle').innerText = tabTitles[tab].sub;
 
-      ['logs', 'certs', 'employees'].forEach(t => {
+      ['logs', 'certs', 'employees', 'calendar'].forEach(t => {
         const btn = document.getElementById(`menu-${t}`);
         const badge = document.getElementById(`badge-${t}`);
 
         if (t === tab) {
           btn.className = "w-full flex items-center justify-between px-3.5 py-3 rounded-xl transition bg-blue-600 text-white font-medium shadow-md";
-          badge.className = "bg-blue-800/80 text-blue-200 px-2 py-0.5 rounded-full text-[10px]";
+          if (t !== 'calendar') badge.className = "bg-blue-800/80 text-blue-200 px-2 py-0.5 rounded-full text-[10px]";
         } else {
           btn.className = "w-full flex items-center justify-between px-3.5 py-3 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white font-medium";
-          badge.className = "bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full text-[10px]";
+          if (t !== 'calendar') badge.className = "bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full text-[10px]";
         }
       });
 
-      const statusFilterWrapper = document.getElementById('wrapper-filter-status');
-      if (tab === 'employees') {
-        statusFilterWrapper.classList.add('hidden');
+      const visualBanner = document.getElementById('visual-summary-banner');
+      const kpiGroup = document.getElementById('kpi-cards-group');
+      const mainTable = document.getElementById('main-table-container');
+      const calendarView = document.getElementById('calendar-view-container');
+
+      if (tab === 'calendar') {
+        visualBanner.classList.add('hidden');
+        kpiGroup.classList.add('hidden');
+        mainTable.classList.add('hidden');
+        calendarView.classList.remove('hidden');
+        renderCalendarTable();
       } else {
-        statusFilterWrapper.classList.remove('hidden');
+        visualBanner.classList.remove('hidden');
+        kpiGroup.classList.remove('hidden');
+        mainTable.classList.remove('hidden');
+        calendarView.classList.add('hidden');
+
+        const statusFilterWrapper = document.getElementById('wrapper-filter-status');
+        if (tab === 'employees') {
+          statusFilterWrapper.classList.add('hidden');
+        } else {
+          statusFilterWrapper.classList.remove('hidden');
+        }
+        applyFilters();
       }
 
       if (window.innerWidth < 768) {
         document.getElementById('sidebar').classList.add('hidden');
         document.getElementById('mobile-menu-icon').className = "fa-solid fa-bars text-lg";
       }
-
-      applyFilters();
     }
 
     function renderTable() {
@@ -739,6 +851,119 @@
 
       tbody.innerHTML = rowsHTML;
       renderPaginationControls(Math.ceil(filteredData.length / pageSize));
+    }
+
+    /* 🌟🌟 JAVASCRIPT CALENDAR DEADLINE LOGIC 🌟🌟 */
+    function renderCalendarTable() {
+      const tbody = document.getElementById('calendar-table-body');
+      const logs = rawData.logs || [];
+
+      if (logs.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="p-10 text-center text-slate-400">
+              ไม่พบประวัติการฝึกอบรมในระบบ
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      const today = new Date();
+      let html = '';
+
+      logs.forEach(log => {
+        const course = courseMap[log.Course_ID] || {};
+        const trainDateStr = log.Start_Date;
+        
+        let deadlineStr = '-';
+        let countdownBadge = '-';
+        let statusBadge = '-';
+
+        if (trainDateStr) {
+          const trainDate = new Date(trainDateStr);
+          if (!isNaN(trainDate)) {
+            // คำนวณวันหมดเขต 60 วันนับจากวันที่อบรม
+            const deadlineDate = new Date(trainDate);
+            deadlineDate.setDate(deadlineDate.getDate() + 60);
+
+            deadlineStr = formatDate(deadlineDate);
+
+            // คำนวณจำนวนวันที่เหลือ
+            const diffTime = deadlineDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (isLogApproved(log)) {
+              countdownBadge = `<span class="bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full font-medium text-[11px]"><i class="fa-solid fa-check-double mr-1"></i> ยื่นรับรองแล้ว</span>`;
+              statusBadge = `<span class="text-emerald-600 font-bold"><i class="fa-solid fa-circle-check mr-1"></i> สมบูรณ์</span>`;
+            } else if (diffDays < 0) {
+              countdownBadge = `<span class="bg-rose-100 text-rose-800 px-2.5 py-1 rounded-full font-bold text-[11px]"><i class="fa-solid fa-triangle-exclamation mr-1"></i> เกิน ${Math.abs(diffDays)} วัน</span>`;
+              statusBadge = `<span class="text-rose-600 font-bold"><i class="fa-solid fa-circle-xmark mr-1"></i> เลยกำหนด 60 วัน</span>`;
+            } else if (diffDays <= 15) {
+              countdownBadge = `<span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full font-bold text-[11px] animate-pulse"><i class="fa-solid fa-clock mr-1"></i> เหลืออีก ${diffDays} วัน</span>`;
+              statusBadge = `<span class="text-amber-600 font-bold"><i class="fa-solid fa-triangle-exclamation mr-1"></i> เร่งด่วน (ใกล้ครบ)</span>`;
+            } else {
+              countdownBadge = `<span class="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full font-medium text-[11px]"><i class="fa-solid fa-hourglass-half mr-1"></i> เหลืออีก ${diffDays} วัน</span>`;
+              statusBadge = `<span class="text-blue-600 font-medium"><i class="fa-solid fa-clock mr-1"></i> อยู่ในกำหนด 60 วัน</span>`;
+            }
+          }
+        }
+
+        html += `
+          <tr class="hover:bg-slate-50 transition border-b border-slate-100 text-xs">
+            <td class="p-3.5 pl-5">
+              <div class="font-bold text-slate-800">${course.Course_Name || log.Course_ID || 'หลักสูตรอบรม'}</div>
+              <div class="text-[11px] text-slate-400">Log ID: ${log.Log_ID || '-'}</div>
+            </td>
+            <td class="p-3.5 text-slate-700 font-medium">${formatDate(trainDateStr)}</td>
+            <td class="p-3.5 text-rose-700 font-bold">${deadlineStr}</td>
+            <td class="p-3.5">${countdownBadge}</td>
+            <td class="p-3.5">${statusBadge}</td>
+            <td class="p-3.5 text-center">
+              <button onclick="switchTab('certs')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-[11px] px-2.5 py-1.5 rounded-lg transition">
+                <i class="fa-solid fa-arrow-right-long mr-1"></i> ดูเอกสาร
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+    }
+
+    function calculateCustomDeadline() {
+      const inputVal = document.getElementById('calc-train-date').value;
+      const resultDiv = document.getElementById('calc-result-date');
+      const statusDiv = document.getElementById('calc-status-badge');
+
+      if (!inputVal) {
+        resultDiv.innerHTML = `<span>-- เลือกวันที่อบรม --</span><i class="fa-solid fa-clock"></i>`;
+        statusDiv.className = "w-full px-3 py-2 bg-slate-200 text-slate-500 rounded-lg text-xs font-medium text-center";
+        statusDiv.innerText = "กรุณาระบุวันที่เพื่อตรวจสอบ";
+        return;
+      }
+
+      const trainDate = new Date(inputVal);
+      const deadlineDate = new Date(trainDate);
+      deadlineDate.setDate(deadlineDate.getDate() + 60);
+
+      const today = new Date();
+      const diffTime = deadlineDate - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      const thDateStr = deadlineDate.toLocaleDateString('th-TH', { day: '2-digit', month: 'long', year: 'numeric' });
+      resultDiv.innerHTML = `<span>${thDateStr}</span><i class="fa-solid fa-calendar-check text-emerald-600"></i>`;
+
+      if (diffDays < 0) {
+        statusDiv.className = "w-full px-3 py-2 bg-rose-100 text-rose-800 rounded-lg text-xs font-bold text-center border border-rose-300";
+        statusDiv.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1"></i> เกินกำหนด 60 วันแล้ว (${Math.abs(diffDays)} วัน)`;
+      } else if (diffDays <= 15) {
+        statusDiv.className = "w-full px-3 py-2 bg-amber-100 text-amber-800 rounded-lg text-xs font-bold text-center border border-amber-300";
+        statusDiv.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> ต้องยื่นเร่งด่วน (เหลือ ${diffDays} วัน)`;
+      } else {
+        statusDiv.className = "w-full px-3 py-2 bg-emerald-100 text-emerald-800 rounded-lg text-xs font-bold text-center border border-emerald-300";
+        statusDiv.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> อยู่ในกำหนดเวลา (เหลือ ${diffDays} วัน)`;
+      }
     }
 
     function getCertCategoryBadge(cat) {
@@ -875,7 +1100,6 @@
     window.addEventListener('DOMContentLoaded', () => {
       loadData();
       
-      // 🌟 ระบบ Auto Refresh ดึงข้อมูลใหม่ทุกๆ 30 นาที (1,800,000 มิลลิวินาที)
       setInterval(() => {
         console.log("Auto refreshing data...");
         loadData();
