@@ -97,7 +97,6 @@
           <span id="badge-employees" class="bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full text-[10px]">0</span>
         </button>
 
-        <!-- 🌟 แท็บใหม่: ปฏิทินยื่นรับรองหลักสูตร -->
         <button onclick="switchTab('calendar')" id="menu-calendar" class="w-full flex items-center justify-between px-3.5 py-3 rounded-xl transition text-slate-300 hover:bg-slate-800 hover:text-white font-medium">
           <div class="flex items-center space-x-3">
             <i class="fa-solid fa-calendar-check text-base text-rose-400"></i>
@@ -151,7 +150,7 @@
 
     <main class="p-4 md:p-6 space-y-6">
 
-      <!-- SECTION: VISUAL สรุปสัดส่วนเป้าหมาย (แสดงในแท็บ Logs, Certs, Employees) -->
+      <!-- SECTION: VISUAL สรุปสัดส่วนเป้าหมาย -->
       <div id="visual-summary-banner" class="bg-gradient-to-r from-slate-900 to-brand-900 rounded-2xl p-4 md:p-6 text-white shadow-lg border border-slate-700/50">
         <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
           
@@ -259,7 +258,7 @@
         </div>
       </div>
 
-      <!-- Main Board / Table Area (สำหรับ Logs, Certs, Employees) -->
+      <!-- Main Board / Table Area -->
       <div id="main-table-container" class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
         <div class="p-4 md:p-5 border-b border-slate-200 bg-slate-50/50 space-y-4">
           <div class="flex items-center justify-between">
@@ -327,10 +326,9 @@
         </div>
       </div>
 
-      <!-- 🌟🌟 PAGE: CALENDAR PAGE DESIGN (แสดงเฉพาะเมื่อสลับไปแท็บ Calendar) 🌟🌟 -->
+      <!-- PAGE: CALENDAR PAGE DESIGN -->
       <div id="calendar-view-container" class="hidden space-y-6">
         
-        <!-- Top Info Alert Banner -->
         <div class="bg-rose-900/90 text-white rounded-2xl p-5 md:p-6 shadow-lg border border-rose-700/50 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div class="space-y-1">
             <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/20 text-rose-200 border border-rose-400/30">
@@ -347,7 +345,6 @@
           </div>
         </div>
 
-        <!-- Section 1: Quick Calculator & Search Lookup Tool -->
         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 md:p-6 space-y-4">
           <div class="flex items-center justify-between border-b border-slate-100 pb-3">
             <h3 class="font-heading font-bold text-sm text-slate-800 flex items-center">
@@ -378,14 +375,14 @@
           </div>
         </div>
 
-        <!-- Section 2: Active Training Logs & Submission Deadline Timeline -->
+        <!-- 🌟🌟 ตารางนับถอยหลังยื่นรับรอง (Group 1 แถวต่อ 1 หลักสูตร) 🌟🌟 -->
         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
           <div class="p-4 md:p-5 border-b border-slate-200 bg-slate-50/50 flex flex-col md:flex-row md:items-center justify-between gap-3">
             <div>
               <h3 class="font-heading font-bold text-sm text-slate-800 flex items-center">
                 <i class="fa-solid fa-clock-rotate-left text-amber-500 mr-2"></i> สถานะการนับถอยหลังยื่นรับรองของรายการอบรมปี 2027
               </h3>
-              <p class="text-xs text-slate-500 mt-0.5">ติดตามรายการที่ต้องรวบรวมเอกสารยื่นกรมพัฒนาฝีมือแรงงาน</p>
+              <p class="text-xs text-slate-500 mt-0.5">สรุปรายหลักสูตรเพื่อเตรียมรวบรวมเอกสารยื่นกรมพัฒนาฝีมือแรงงาน</p>
             </div>
             
             <div class="flex items-center space-x-2 text-xs">
@@ -399,16 +396,15 @@
             <table class="w-full text-left border-collapse text-xs whitespace-nowrap md:whitespace-normal">
               <thead class="bg-slate-100/80 text-slate-700 font-heading font-semibold uppercase tracking-wider border-b border-slate-200">
                 <tr>
-                  <th class="p-3.5 pl-5">หลักสูตร / รหัส Log</th>
+                  <th class="p-3.5 pl-5">หลักสูตร / จำนวนผู้เข้าอบรม</th>
                   <th class="p-3.5">วันที่จัดอบรม</th>
                   <th class="p-3.5">วันสุดท้ายที่ต้องยื่น (60 วัน)</th>
-                  <th class="p-3.5">นับถอยหลัง (Remaining)</th>
+                  <th class="p-3.5">นับถอยหลัง (REMAINING)</th>
                   <th class="p-3.5">สถานะการยื่นรับรอง</th>
                   <th class="p-3.5 text-center">การดำเนินการ</th>
                 </tr>
               </thead>
               <tbody id="calendar-table-body" class="divide-y divide-slate-100 text-slate-700">
-                <!-- Javascript will render dynamic rows here -->
               </tbody>
             </table>
           </div>
@@ -417,6 +413,55 @@
       </div>
 
     </main>
+  </div>
+
+  <!-- 🌟🌟 MODAL: แสดงรายชื่อผู้เข้าอบรมในหลักสูตร 🌟🌟 -->
+  <div id="attendees-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="bg-brand-900 text-white p-4 md:p-5 flex items-center justify-between border-b border-slate-800">
+        <div>
+          <h3 class="font-heading font-bold text-base md:text-lg text-white" id="modal-course-title">รายชื่อผู้เข้าร่วมอบรม</h3>
+          <p class="text-xs text-blue-300 mt-0.5" id="modal-course-sub">วันที่อบรม: -</p>
+        </div>
+        <button onclick="closeAttendeesModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="p-4 md:p-6 overflow-y-auto space-y-4">
+        <div class="flex items-center justify-between bg-blue-50 border border-blue-100 rounded-xl p-3 text-xs text-blue-900">
+          <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-users text-blue-600 text-sm"></i>
+            <span>จำนวนผู้เข้าร่วมทั้งหมด: <strong id="modal-total-count" class="text-blue-700 font-bold">0</strong> คน</span>
+          </div>
+          <span id="modal-approved-badge" class="bg-emerald-100 text-emerald-800 font-medium px-2.5 py-0.5 rounded-full text-[11px]">
+            รับรองแล้ว 0 คน
+          </span>
+        </div>
+
+        <div class="overflow-x-auto border border-slate-200 rounded-xl">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-700 font-heading font-semibold border-b border-slate-200">
+              <tr>
+                <th class="p-3 pl-4">รหัสพนักงาน</th>
+                <th class="p-3">ชื่อ-นามสกุล</th>
+                <th class="p-3">แผนก/ฝ่าย</th>
+                <th class="p-3">ตำแหน่ง</th>
+                <th class="p-3 text-center">สถานะการรับรอง</th>
+              </tr>
+            </thead>
+            <tbody id="modal-table-body" class="divide-y divide-slate-100">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end">
+        <button onclick="closeAttendeesModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-800 text-white text-xs font-medium rounded-lg transition shadow-sm">
+          ปิดหน้าต่าง
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- JAVASCRIPT LOGIC -->
@@ -431,6 +476,7 @@
 
     let empMap = {};
     let courseMap = {};
+    let groupedCourseData = {}; // เก็บข้อมูล Group หลักสูตรสำหรับ Modal
 
     function toggleMobileSidebar() {
       const sidebar = document.getElementById('sidebar');
@@ -704,7 +750,7 @@
         kpiGroup.classList.add('hidden');
         mainTable.classList.add('hidden');
         calendarView.classList.remove('hidden');
-        renderCalendarTable();
+        renderCalendarTableGrouped();
       } else {
         visualBanner.classList.remove('hidden');
         kpiGroup.classList.remove('hidden');
@@ -853,8 +899,8 @@
       renderPaginationControls(Math.ceil(filteredData.length / pageSize));
     }
 
-    /* 🌟🌟 JAVASCRIPT CALENDAR DEADLINE LOGIC 🌟🌟 */
-    function renderCalendarTable() {
+    /* 🌟🌟 JAVASCRIPT CALENDAR GROUPED LOGIC (1 แถวต่อ 1 หลักสูตร) 🌟🌟 */
+    function renderCalendarTableGrouped() {
       const tbody = document.getElementById('calendar-table-body');
       const logs = rawData.logs || [];
 
@@ -869,41 +915,63 @@
         return;
       }
 
+      // Group by Course_ID + Start_Date
+      groupedCourseData = {};
+      logs.forEach(log => {
+        const cId = log.Course_ID || 'UNCATEGORIZED';
+        const dStr = log.Start_Date || 'NO_DATE';
+        const groupKey = `${cId}_${dStr}`;
+
+        if (!groupedCourseData[groupKey]) {
+          const course = courseMap[cId] || {};
+          groupedCourseData[groupKey] = {
+            courseId: cId,
+            courseName: course.Course_Name || cId || 'หลักสูตรอบรม',
+            startDate: dStr,
+            logs: []
+          };
+        }
+        groupedCourseData[groupKey].logs.push(log);
+      });
+
       const today = new Date();
       let html = '';
 
-      logs.forEach(log => {
-        const course = courseMap[log.Course_ID] || {};
-        const trainDateStr = log.Start_Date;
-        
+      Object.keys(groupedCourseData).forEach(groupKey => {
+        const group = groupedCourseData[groupKey];
+        const attendeeCount = group.logs.length;
+        const trainDateStr = group.startDate;
+
         let deadlineStr = '-';
         let countdownBadge = '-';
         let statusBadge = '-';
 
-        if (trainDateStr) {
+        // เช็กสัดส่วนการรับรองในกลุ่ม
+        let approvedInGroup = 0;
+        group.logs.forEach(l => { if (isLogApproved(l)) approvedInGroup++; });
+
+        if (trainDateStr && trainDateStr !== 'NO_DATE') {
           const trainDate = new Date(trainDateStr);
           if (!isNaN(trainDate)) {
-            // คำนวณวันหมดเขต 60 วันนับจากวันที่อบรม
             const deadlineDate = new Date(trainDate);
             deadlineDate.setDate(deadlineDate.getDate() + 60);
 
             deadlineStr = formatDate(deadlineDate);
 
-            // คำนวณจำนวนวันที่เหลือ
             const diffTime = deadlineDate - today;
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-            if (isLogApproved(log)) {
-              countdownBadge = `<span class="bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full font-medium text-[11px]"><i class="fa-solid fa-check-double mr-1"></i> ยื่นรับรองแล้ว</span>`;
+            if (approvedInGroup === attendeeCount) {
+              countdownBadge = `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-full font-medium text-[11px]"><i class="fa-solid fa-check-double mr-1"></i> ยื่นครบ ${attendeeCount} คนแล้ว</span>`;
               statusBadge = `<span class="text-emerald-600 font-bold"><i class="fa-solid fa-circle-check mr-1"></i> สมบูรณ์</span>`;
             } else if (diffDays < 0) {
-              countdownBadge = `<span class="bg-rose-100 text-rose-800 px-2.5 py-1 rounded-full font-bold text-[11px]"><i class="fa-solid fa-triangle-exclamation mr-1"></i> เกิน ${Math.abs(diffDays)} วัน</span>`;
+              countdownBadge = `<span class="bg-rose-100 text-rose-800 border border-rose-300 px-2.5 py-1 rounded-full font-bold text-[11px]"><i class="fa-solid fa-triangle-exclamation mr-1"></i> เกิน ${Math.abs(diffDays)} วัน</span>`;
               statusBadge = `<span class="text-rose-600 font-bold"><i class="fa-solid fa-circle-xmark mr-1"></i> เลยกำหนด 60 วัน</span>`;
             } else if (diffDays <= 15) {
-              countdownBadge = `<span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full font-bold text-[11px] animate-pulse"><i class="fa-solid fa-clock mr-1"></i> เหลืออีก ${diffDays} วัน</span>`;
+              countdownBadge = `<span class="bg-amber-100 text-amber-800 border border-amber-300 px-2.5 py-1 rounded-full font-bold text-[11px] animate-pulse"><i class="fa-solid fa-clock mr-1"></i> เหลืออีก ${diffDays} วัน</span>`;
               statusBadge = `<span class="text-amber-600 font-bold"><i class="fa-solid fa-triangle-exclamation mr-1"></i> เร่งด่วน (ใกล้ครบ)</span>`;
             } else {
-              countdownBadge = `<span class="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full font-medium text-[11px]"><i class="fa-solid fa-hourglass-half mr-1"></i> เหลืออีก ${diffDays} วัน</span>`;
+              countdownBadge = `<span class="bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-1 rounded-full font-medium text-[11px]"><i class="fa-solid fa-hourglass-half mr-1"></i> เหลืออีก ${diffDays} วัน</span>`;
               statusBadge = `<span class="text-blue-600 font-medium"><i class="fa-solid fa-clock mr-1"></i> อยู่ในกำหนด 60 วัน</span>`;
             }
           }
@@ -912,16 +980,20 @@
         html += `
           <tr class="hover:bg-slate-50 transition border-b border-slate-100 text-xs">
             <td class="p-3.5 pl-5">
-              <div class="font-bold text-slate-800">${course.Course_Name || log.Course_ID || 'หลักสูตรอบรม'}</div>
-              <div class="text-[11px] text-slate-400">Log ID: ${log.Log_ID || '-'}</div>
+              <div class="font-bold text-slate-800 text-sm">${group.courseName}</div>
+              <div class="text-[11px] text-slate-500 mt-0.5 flex items-center">
+                <i class="fa-solid fa-users text-blue-600 mr-1.5"></i>
+                <span>ผู้เข้าอบรมรุ่นนี้: <strong class="text-blue-700 font-bold">${attendeeCount}</strong> คน</span>
+                ${approvedInGroup > 0 ? `<span class="ml-2 text-emerald-600 font-medium">(รับรองแล้ว ${approvedInGroup}/${attendeeCount})</span>` : ''}
+              </div>
             </td>
-            <td class="p-3.5 text-slate-700 font-medium">${formatDate(trainDateStr)}</td>
+            <td class="p-3.5 text-slate-700 font-semibold">${formatDate(trainDateStr)}</td>
             <td class="p-3.5 text-rose-700 font-bold">${deadlineStr}</td>
             <td class="p-3.5">${countdownBadge}</td>
             <td class="p-3.5">${statusBadge}</td>
             <td class="p-3.5 text-center">
-              <button onclick="switchTab('certs')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-[11px] px-2.5 py-1.5 rounded-lg transition">
-                <i class="fa-solid fa-arrow-right-long mr-1"></i> ดูเอกสาร
+              <button onclick="openAttendeesModal('${groupKey}')" class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white font-medium text-[11px] px-3 py-1.5 rounded-lg shadow-sm transition active:scale-95">
+                <i class="fa-solid fa-address-book mr-1.5"></i> รายชื่อพนักงาน
               </button>
             </td>
           </tr>
@@ -929,6 +1001,45 @@
       });
 
       tbody.innerHTML = html;
+    }
+
+    /* 🌟🌟 MODAL FUNCTIONS: แสดงป๊อปอัปรายชื่อพนักงานในหลักสูตร 🌟🌟 */
+    function openAttendeesModal(groupKey) {
+      const group = groupedCourseData[groupKey];
+      if (!group) return;
+
+      document.getElementById('modal-course-title').innerText = group.courseName;
+      document.getElementById('modal-course-sub').innerText = `วันที่จัดอบรม: ${formatDate(group.startDate)}`;
+
+      const modalTbody = document.getElementById('modal-table-body');
+      let approvedCount = 0;
+      let rowsHTML = '';
+
+      group.logs.forEach(log => {
+        const emp = empMap[log.Employee_ID] || {};
+        const isApproved = isLogApproved(log);
+        if (isApproved) approvedCount++;
+
+        rowsHTML += `
+          <tr class="hover:bg-slate-50 transition border-b border-slate-100 text-xs">
+            <td class="p-3 pl-4 font-semibold text-slate-700">${log.Employee_ID}</td>
+            <td class="p-3 font-medium text-slate-900">${emp.First_Name || ''} ${emp.Last_Name || ''}</td>
+            <td class="p-3 text-slate-600">${emp.Department || '-'}</td>
+            <td class="p-3 text-slate-600">${emp.Position || '-'}</td>
+            <td class="p-3 text-center">${getCertApprovalStatusBadge(log)}</td>
+          </tr>
+        `;
+      });
+
+      document.getElementById('modal-total-count').innerText = group.logs.length;
+      document.getElementById('modal-approved-badge').innerText = `รับรองแล้ว ${approvedCount} / ${group.logs.length} คน`;
+      modalTbody.innerHTML = rowsHTML;
+
+      document.getElementById('attendees-modal').classList.remove('hidden');
+    }
+
+    function closeAttendeesModal() {
+      document.getElementById('attendees-modal').classList.add('hidden');
     }
 
     function calculateCustomDeadline() {
