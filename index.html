@@ -250,7 +250,7 @@
           <div>
             <p class="text-[11px] md:text-xs font-medium text-slate-400">สัดส่วนความสำเร็จ</p>
             <h3 class="text-xl md:text-2xl font-heading font-bold text-amber-500 mt-1" id="kpi-total-certs">0%</h3>
-            <p class="text-[10px] md:text-[11px] text-amber-600 mt-1"><i class="fa-solid fa-award mr-1"></i>เป้าหมาย 50%</p>
+            <p class="text-[10px] md:text-[11px] text-amber-600 mt-1" id="kpi-target-pct-sub"><i class="fa-solid fa-award mr-1"></i>เป้าหมาย 50%</p>
           </div>
           <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 text-lg md:text-xl shrink-0">
             <i class="fa-solid fa-award"></i>
@@ -375,7 +375,6 @@
           </div>
         </div>
 
-        <!-- 🌟🌟 ตารางนับถอยหลังยื่นรับรอง (Group 1 แถวต่อ 1 หลักสูตร) 🌟🌟 -->
         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
           <div class="p-4 md:p-5 border-b border-slate-200 bg-slate-50/50 flex flex-col md:flex-row md:items-center justify-between gap-3">
             <div>
@@ -415,7 +414,7 @@
     </main>
   </div>
 
-  <!-- 🌟🌟 MODAL: แสดงรายชื่อผู้เข้าอบรมในหลักสูตร 🌟🌟 -->
+  <!-- MODAL: แสดงรายชื่อผู้เข้าอบรมในหลักสูตร -->
   <div id="attendees-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh]">
       <div class="bg-brand-900 text-white p-4 md:p-5 flex items-center justify-between border-b border-slate-800">
@@ -476,7 +475,7 @@
 
     let empMap = {};
     let courseMap = {};
-    let groupedCourseData = {}; // เก็บข้อมูล Group หลักสูตรสำหรับ Modal
+    let groupedCourseData = {};
 
     function toggleMobileSidebar() {
       const sidebar = document.getElementById('sidebar');
@@ -526,10 +525,27 @@
       }
     }
 
+    // 🌟 ตรวจสอบสถานะการรับรองจากคอลัมน์ G หรือ Cert_Status / PDF
     function isLogApproved(l) {
+      // ดึงค่าจากคอลัมน์ G โดยตรง (Col_G_Value) หรือจากฟิลด์ Cert_Status
+      const colG = String(l.Col_G_Value || '').toLowerCase().trim();
       const cs = String(l.Cert_Status || '').toLowerCase().trim();
-      if (cs.includes('approved') || cs.includes('รับรองแล้ว') || cs.includes('ผ่านการรับรอง')) {
-        return true;
+      const combinedStatus = `${colG} ${cs}`;
+
+      if (
+        combinedStatus.includes('approved') || 
+        combinedStatus.includes('รับรองแล้ว') || 
+        combinedStatus.includes('ผ่านการรับรอง') ||
+        combinedStatus.includes('ผ่าน') ||
+        colG === 'yes' || 
+        colG === 'y' || 
+        colG === 'true' ||
+        colG === '1'
+      ) {
+        // ยกเว้นคำว่า "ไม่รับรอง" หรือ "รอรับรอง"
+        if (!combinedStatus.includes('ไม่') && !combinedStatus.includes('รอ') && !combinedStatus.includes('pending')) {
+          return true;
+        }
       }
       if (l.Cert_PDF_URL && String(l.Cert_PDF_URL).trim() !== '') {
         return true;
@@ -541,41 +557,50 @@
       const logCount = (rawData.logs || []).length;
       const courseCount = (rawData.courses || []).length;
 
-      let totalCompanyEmployees = 1200;
+      // 🌟 ดึงค่าจากชีต Company_Target ตามที่คุณกรอกจริง
+      let totalCompanyEmployees = 0;
       let targetYear = 2027;
-      let targetCountFromSheet = 0;
+      let targetPercentage = 50;
+      let finalTargetCount = 0;
 
       if (rawData.companyTarget && rawData.companyTarget.length > 0) {
         const targetRow = rawData.companyTarget[0];
-        if (targetRow.Total_Employees) totalCompanyEmployees = parseInt(targetRow.Total_Employees) || 1200;
+        totalCompanyEmployees = parseInt(targetRow.Total_Employees) || 0;
         if (targetRow.Target_Year) targetYear = targetRow.Target_Year;
-        if (targetRow.Mandatory_Target_Count) targetCountFromSheet = parseInt(targetRow.Mandatory_Target_Count) || 0;
+        if (targetRow.Target_Percentage) targetPercentage = parseFloat(targetRow.Target_Percentage) || 50;
+        finalTargetCount = parseInt(targetRow.Mandatory_Target_Count) || 0;
       }
 
-      const minRequiredTarget = Math.ceil(totalCompanyEmployees * 0.5);
-      const finalTargetCount = targetCountFromSheet > 0 ? targetCountFromSheet : minRequiredTarget;
+      // กรณีไม่ได้กรอกในชีตเลย ให้ใช้ค่าสำรอง
+      if (totalCompanyEmployees <= 0) totalCompanyEmployees = 1183;
+      if (finalTargetCount <= 0) finalTargetCount = Math.ceil(totalCompanyEmployees * (targetPercentage / 100));
 
+      // 🌟 นับจำนวนพนักงานที่รับรองแล้วแบบไม่ซ้ำรหัสพนักงาน จากคอลัมน์ G ใน Training_Logs
       const approvedEmpSet = new Set();
       (rawData.logs || []).forEach(l => {
-        if (isLogApproved(l)) {
-          approvedEmpSet.add(l.Employee_ID);
+        if (isLogApproved(l) && l.Employee_ID) {
+          approvedEmpSet.add(String(l.Employee_ID).trim());
         }
       });
 
       const approvedCount = approvedEmpSet.size;
       const passPct = totalCompanyEmployees > 0 ? ((approvedCount / totalCompanyEmployees) * 100).toFixed(1) : 0;
 
+      // อัปเดตตัวเลข KPI Cards
       document.getElementById('kpi-total-emp').innerText = approvedCount.toLocaleString();
       document.getElementById('kpi-total-company-sub').innerText = totalCompanyEmployees.toLocaleString();
       document.getElementById('kpi-total-logs').innerText = logCount.toLocaleString();
       document.getElementById('kpi-total-courses').innerText = courseCount.toLocaleString();
       document.getElementById('kpi-total-certs').innerText = `${passPct}%`;
+      document.getElementById('kpi-target-pct-sub').innerHTML = `<i class="fa-solid fa-award mr-1"></i>เป้าหมาย ${targetPercentage}%`;
+      document.getElementById('target-pct-label').innerText = `≥ ${targetPercentage}%`;
       
       const thYear = parseInt(targetYear) + 543;
       const yearText = `${targetYear} (พ.ศ. ${thYear})`;
       document.getElementById('header-fiscal-year').innerText = yearText;
       document.getElementById('visual-year').innerText = yearText;
 
+      // อัปเดต Banner Visual
       document.getElementById('visual-approved-count').innerText = `${approvedCount.toLocaleString()} คน`;
       document.getElementById('visual-total-company').innerText = `${totalCompanyEmployees.toLocaleString()} คน`;
       document.getElementById('visual-target-count').innerText = `${finalTargetCount.toLocaleString()} คน`;
@@ -583,8 +608,8 @@
 
       const circleProgress = document.getElementById('circle-progress');
       if (circleProgress) {
-        circleProgress.setAttribute('stroke-dasharray', `${passPct}, 100`);
-        if (parseFloat(passPct) >= 50) {
+        circleProgress.setAttribute('stroke-dasharray', `${Math.min(passPct, 100)}, 100`);
+        if (approvedCount >= finalTargetCount) {
           circleProgress.classList.remove('text-amber-400');
           circleProgress.classList.add('text-emerald-400');
         } else {
@@ -599,13 +624,14 @@
         barFill.style.width = `${barPct}%`;
       }
 
+      // 🌟 คำนวณสถานะตามเป้าหมาย: เป้าหมายขั้นต่ำ - พนักงานที่รับรองแล้ว
       const targetStatus = document.getElementById('visual-target-status');
       if (approvedCount >= finalTargetCount) {
         targetStatus.innerText = "🎉 ผ่านเป้าหมายแล้ว";
         targetStatus.className = "font-bold text-emerald-400";
       } else {
         const remaining = finalTargetCount - approvedCount;
-        targetStatus.innerText = `ขาดอีก ${remaining.toLocaleString()} คน`;
+        targetStatus.innerText = `คงเหลือ ${remaining.toLocaleString()} คน`;
         targetStatus.className = "font-bold text-amber-300";
       }
 
@@ -721,7 +747,7 @@
         logs: { title: "ประวัติการเข้ารับการฝึกอบรม (Training Action Plan Logs)", sub: "ระบบติดตามการฝึกอบรมพนักงานประจำปีงบประมาณ 2027 (พ.ศ. 2570)" },
         certs: { title: "ผู้ผ่านการรับรองหลักสูตร (Certifications / กรมพัฒนาฝีมือแรงงาน)", sub: "ระบบตรวจสอบคุณวุฒิฝีมือแรงงานและเอกสารรับรอง PDF" },
         employees: { title: "ข้อมูลรายบุคคลพนักงาน (Employee Training Profiles)", sub: "ระบบค้นหาและดูสถิติประวัติการอบรมรายบุคคล" },
-        calendar: { title: "ปฏิทินยื่นขอรับรองหลักสูตร 60 วัน (Submission Deadline Calendar)", sub: "ระบบคำนวณและติดตามวันหมดเขตรวบรวมเอกสารยื่นยื่นกรมพัฒนาฝีมือแรงงาน" }
+        calendar: { title: "ปฏิทินยื่นขอรับรองหลักสูตร 60 วัน (Submission Deadline Calendar)", sub: "ระบบคำนวณและติดตามวันหมดเขตรวบรวมเอกสารยื่นกรมพัฒนาฝีมือแรงงาน" }
       };
 
       document.getElementById('page-title').innerText = tabTitles[tab].title;
@@ -899,7 +925,6 @@
       renderPaginationControls(Math.ceil(filteredData.length / pageSize));
     }
 
-    /* 🌟🌟 JAVASCRIPT CALENDAR GROUPED LOGIC (1 แถวต่อ 1 หลักสูตร) 🌟🌟 */
     function renderCalendarTableGrouped() {
       const tbody = document.getElementById('calendar-table-body');
       const logs = rawData.logs || [];
@@ -915,7 +940,6 @@
         return;
       }
 
-      // Group by Course_ID + Start_Date
       groupedCourseData = {};
       logs.forEach(log => {
         const cId = log.Course_ID || 'UNCATEGORIZED';
@@ -946,7 +970,6 @@
         let countdownBadge = '-';
         let statusBadge = '-';
 
-        // เช็กสัดส่วนการรับรองในกลุ่ม
         let approvedInGroup = 0;
         group.logs.forEach(l => { if (isLogApproved(l)) approvedInGroup++; });
 
@@ -1003,7 +1026,6 @@
       tbody.innerHTML = html;
     }
 
-    /* 🌟🌟 MODAL FUNCTIONS: แสดงป๊อปอัปรายชื่อพนักงานในหลักสูตร 🌟🌟 */
     function openAttendeesModal(groupKey) {
       const group = groupedCourseData[groupKey];
       if (!group) return;
@@ -1090,13 +1112,13 @@
     }
 
     function getCertApprovalStatusBadge(l) {
+      const colG = String(l.Col_G_Value || '').toLowerCase().trim();
       const statusStr = String(l.Cert_Status || '').toLowerCase().trim();
+      const combined = `${colG} ${statusStr}`;
 
       if (isLogApproved(l)) {
         return `<span class="inline-flex items-center bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-full text-[11px] font-medium"><i class="fa-solid fa-circle-check mr-1"></i> รับรองแล้ว</span>`;
-      } else if (statusStr.includes('pending') || statusStr.includes('รอ')) {
-        return `<span class="inline-flex items-center bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-1 rounded-full text-[11px] font-medium"><i class="fa-solid fa-clock mr-1"></i> รอรับรอง</span>`;
-      } else if (statusStr.includes('not') || statusStr.includes('ไม่')) {
+      } else if (combined.includes('not') || combined.includes('ไม่')) {
         return `<span class="inline-flex items-center bg-rose-50 text-rose-700 border border-rose-200 px-2.5 py-1 rounded-full text-[11px] font-medium"><i class="fa-solid fa-circle-xmark mr-1"></i> ไม่รับรอง</span>`;
       }
       
