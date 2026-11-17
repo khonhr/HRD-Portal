@@ -156,7 +156,7 @@
           
           <div class="space-y-2 text-center lg:text-left max-w-lg">
             <div class="inline-flex items-center px-3 py-1 rounded-full text-[11px] md:text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-400/30">
-              <i class="fa-solid fa-scale-balanced mr-1.5"></i> เป้าหมายตาม พรบ. ส่งเสริมการพัฒนาฝีมือแรงงาน (<span id="target-pct-label">≥ 50%</span>)
+              <i class="fa-solid fa-scale-balanced mr-1.5"></i> เป้าหมายตาม พรบ. ส่งเสริมการพัฒนาฝีมือแรงงาน (<span id="target-pct-label">≥ 70%</span>)
             </div>
             <h3 class="text-lg md:text-xl font-heading font-bold text-white leading-tight">
               สัดส่วนการได้รับการรับรองพนักงานประจำปี <span id="visual-year">2027 (พ.ศ. 2570)</span>
@@ -250,7 +250,7 @@
           <div>
             <p class="text-[11px] md:text-xs font-medium text-slate-400">สัดส่วนความสำเร็จ</p>
             <h3 class="text-xl md:text-2xl font-heading font-bold text-amber-500 mt-1" id="kpi-total-certs">0%</h3>
-            <p class="text-[10px] md:text-[11px] text-amber-600 mt-1" id="kpi-target-pct-sub"><i class="fa-solid fa-award mr-1"></i>เป้าหมาย 50%</p>
+            <p class="text-[10px] md:text-[11px] text-amber-600 mt-1" id="kpi-target-pct-sub"><i class="fa-solid fa-award mr-1"></i>เป้าหมาย 70%</p>
           </div>
           <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 text-lg md:text-xl shrink-0">
             <i class="fa-solid fa-award"></i>
@@ -477,6 +477,12 @@
     let courseMap = {};
     let groupedCourseData = {};
 
+    function parseCleanNumber(val, defaultVal = 0) {
+      if (val === undefined || val === null || val === '') return defaultVal;
+      const num = parseFloat(String(val).replace(/,/g, '').trim());
+      return isNaN(num) ? defaultVal : num;
+    }
+
     function toggleMobileSidebar() {
       const sidebar = document.getElementById('sidebar');
       const icon = document.getElementById('mobile-menu-icon');
@@ -525,9 +531,7 @@
       }
     }
 
-    // 🌟 ตรวจสอบสถานะการรับรองจากคอลัมน์ G หรือ Cert_Status / PDF
     function isLogApproved(l) {
-      // ดึงค่าจากคอลัมน์ G โดยตรง (Col_G_Value) หรือจากฟิลด์ Cert_Status
       const colG = String(l.Col_G_Value || '').toLowerCase().trim();
       const cs = String(l.Cert_Status || '').toLowerCase().trim();
       const combinedStatus = `${colG} ${cs}`;
@@ -542,7 +546,6 @@
         colG === 'true' ||
         colG === '1'
       ) {
-        // ยกเว้นคำว่า "ไม่รับรอง" หรือ "รอรับรอง"
         if (!combinedStatus.includes('ไม่') && !combinedStatus.includes('รอ') && !combinedStatus.includes('pending')) {
           return true;
         }
@@ -557,7 +560,6 @@
       const logCount = (rawData.logs || []).length;
       const courseCount = (rawData.courses || []).length;
 
-      // 🌟 ดึงค่าจากชีต Company_Target ตามที่คุณกรอกจริง
       let totalCompanyEmployees = 0;
       let targetYear = 2027;
       let targetPercentage = 50;
@@ -565,17 +567,15 @@
 
       if (rawData.companyTarget && rawData.companyTarget.length > 0) {
         const targetRow = rawData.companyTarget[0];
-        totalCompanyEmployees = parseInt(targetRow.Total_Employees) || 0;
+        totalCompanyEmployees = parseCleanNumber(targetRow.Total_Employees, 0);
         if (targetRow.Target_Year) targetYear = targetRow.Target_Year;
-        if (targetRow.Target_Percentage) targetPercentage = parseFloat(targetRow.Target_Percentage) || 50;
-        finalTargetCount = parseInt(targetRow.Mandatory_Target_Count) || 0;
+        if (targetRow.Target_Percentage) targetPercentage = parseCleanNumber(targetRow.Target_Percentage, 50);
+        finalTargetCount = parseCleanNumber(targetRow.Mandatory_Target_Count, 0);
       }
 
-      // กรณีไม่ได้กรอกในชีตเลย ให้ใช้ค่าสำรอง
       if (totalCompanyEmployees <= 0) totalCompanyEmployees = 1183;
       if (finalTargetCount <= 0) finalTargetCount = Math.ceil(totalCompanyEmployees * (targetPercentage / 100));
 
-      // 🌟 นับจำนวนพนักงานที่รับรองแล้วแบบไม่ซ้ำรหัสพนักงาน จากคอลัมน์ G ใน Training_Logs
       const approvedEmpSet = new Set();
       (rawData.logs || []).forEach(l => {
         if (isLogApproved(l) && l.Employee_ID) {
@@ -586,7 +586,6 @@
       const approvedCount = approvedEmpSet.size;
       const passPct = totalCompanyEmployees > 0 ? ((approvedCount / totalCompanyEmployees) * 100).toFixed(1) : 0;
 
-      // อัปเดตตัวเลข KPI Cards
       document.getElementById('kpi-total-emp').innerText = approvedCount.toLocaleString();
       document.getElementById('kpi-total-company-sub').innerText = totalCompanyEmployees.toLocaleString();
       document.getElementById('kpi-total-logs').innerText = logCount.toLocaleString();
@@ -600,7 +599,6 @@
       document.getElementById('header-fiscal-year').innerText = yearText;
       document.getElementById('visual-year').innerText = yearText;
 
-      // อัปเดต Banner Visual
       document.getElementById('visual-approved-count').innerText = `${approvedCount.toLocaleString()} คน`;
       document.getElementById('visual-total-company').innerText = `${totalCompanyEmployees.toLocaleString()} คน`;
       document.getElementById('visual-target-count').innerText = `${finalTargetCount.toLocaleString()} คน`;
@@ -624,7 +622,6 @@
         barFill.style.width = `${barPct}%`;
       }
 
-      // 🌟 คำนวณสถานะตามเป้าหมาย: เป้าหมายขั้นต่ำ - พนักงานที่รับรองแล้ว
       const targetStatus = document.getElementById('visual-target-status');
       if (approvedCount >= finalTargetCount) {
         targetStatus.innerText = "🎉 ผ่านเป้าหมายแล้ว";
