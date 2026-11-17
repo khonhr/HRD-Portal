@@ -562,14 +562,14 @@
 
       let totalCompanyEmployees = 0;
       let targetYear = 2027;
-      let targetPercentage = 50;
+      let targetPercentage = 70;
       let finalTargetCount = 0;
 
       if (rawData.companyTarget && rawData.companyTarget.length > 0) {
         const targetRow = rawData.companyTarget[0];
         totalCompanyEmployees = parseCleanNumber(targetRow.Total_Employees, 0);
         if (targetRow.Target_Year) targetYear = targetRow.Target_Year;
-        if (targetRow.Target_Percentage) targetPercentage = parseCleanNumber(targetRow.Target_Percentage, 50);
+        if (targetRow.Target_Percentage) targetPercentage = parseCleanNumber(targetRow.Target_Percentage, 70);
         finalTargetCount = parseCleanNumber(targetRow.Mandatory_Target_Count, 0);
       }
 
@@ -905,7 +905,7 @@
           rowsHTML += `
             <tr class="hover:bg-slate-50 transition border-b border-slate-100">
               <td class="p-3.5 pl-5 font-semibold text-slate-700">${item.Employee_ID}</td>
-              <td class="p-3.5 font-medium text-slate-900">${item.First_Name || ''} ${item.Last_Name || ''}</td>
+              <td class="p-3.5 font-medium text-slate-900">${emp.First_Name || ''} ${emp.Last_Name || ''}</td>
               <td class="p-3.5">${item.Department || '-'}</td>
               <td class="p-3.5">${item.Position || '-'}</td>
               <td class="p-3.5 text-center">
