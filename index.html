@@ -60,7 +60,6 @@
       background-attachment: fixed;
     }
 
-    /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
@@ -69,7 +68,7 @@
 </head>
 <body class="min-h-screen font-sans text-slate-800 antialiased forth-ems-bg flex flex-col">
 
-  <!-- TOP COMMAND NAVIGATION BAR (Smart Command Style) -->
+  <!-- TOP COMMAND NAVIGATION BAR -->
   <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-forth-100/80 px-4 lg:px-7 py-3 shadow-sm">
     <div class="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-3">
       
@@ -85,7 +84,7 @@
         <div>
           <div class="flex items-center space-x-2">
             <h1 class="font-heading font-bold text-lg text-forth-900 tracking-tight leading-none">HRD Smart Command</h1>
-            <span class="hidden sm:inline-block px-2 py-0.5 text-[10px] font-heading font-semibold bg-forth-50 text-forth-600 border border-forth-200 rounded-full">v2.0</span>
+            <span class="hidden sm:inline-block px-2 py-0.5 text-[10px] font-heading font-semibold bg-forth-50 text-forth-600 border border-forth-200 rounded-full">Live Sync</span>
           </div>
           <p class="text-[11px] font-heading font-semibold text-forth-600 tracking-wider uppercase mt-1">FORTH EMS PUBLIC COMPANY LIMITED</p>
         </div>
@@ -121,7 +120,7 @@
 
         <div class="h-4 w-[1px] bg-slate-200"></div>
 
-        <button onclick="loadData()" title="อัปเดตข้อมูลล่าสุดจาก Google Sheet" class="px-3 py-1.5 rounded-full text-xs font-heading font-medium text-forth-700 hover:bg-forth-50 transition flex items-center space-x-1.5">
+        <button onclick="loadData()" title="ดึงค่าล่าสุดจาก Google Sheet ทันที" class="px-3 py-1.5 rounded-full text-xs font-heading font-medium text-forth-700 hover:bg-forth-50 transition flex items-center space-x-1.5">
           <i class="fa-solid fa-arrows-rotate text-forth-500" id="refresh-icon"></i>
           <span class="hidden sm:inline">รีเฟรช</span>
         </button>
@@ -138,13 +137,13 @@
   <!-- MAIN CONTENT WORKSPACE -->
   <main class="flex-1 max-w-[1600px] w-full mx-auto p-4 lg:p-6">
 
-    <!-- VIEW 1: BENTO GRID DASHBOARD (LOGS / CERTS / EMPLOYEES) -->
+    <!-- VIEW 1: BENTO GRID DASHBOARD -->
     <div id="bento-dashboard-view" class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
       
-      <!-- LEFT COLUMN (4 Cols): Organization Context + Paired KPI Cards + Trend Area Chart -->
+      <!-- LEFT COLUMN (4 Cols) -->
       <div class="lg:col-span-4 space-y-5">
         
-        <!-- Card 1: Area / Fiscal Year & API Live Card (Matches Top-Left Smart Command Card) -->
+        <!-- Card 1: Area / Fiscal Year & API Live Card -->
         <div class="bg-white/95 backdrop-blur-sm rounded-3xl p-4 border border-white shadow-bento flex flex-wrap sm:flex-nowrap items-center justify-between gap-3">
           <div class="flex items-center space-x-2.5 shrink-0">
             <div class="w-9 h-9 rounded-2xl bg-forth-50 text-forth-600 flex items-center justify-center border border-forth-100">
@@ -152,18 +151,16 @@
             </div>
             <div>
               <span class="text-[10px] font-semibold text-slate-400 uppercase block leading-none">ปีงบประมาณ</span>
-              <span id="header-fiscal-year" class="text-xs font-heading font-bold text-forth-900 mt-1 block">2027 (พ.ศ. 2570)</span>
+              <span id="header-fiscal-year" class="text-xs font-heading font-bold text-forth-900 mt-1 block">กำลังโหลด...</span>
             </div>
           </div>
 
-          <!-- Department Quick Selector Pill -->
           <div class="flex-1 min-w-[140px]">
             <select id="filter-dept" onchange="handleGlobalDeptChange()" class="w-full px-3.5 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200/90 rounded-full text-xs font-heading font-medium text-slate-700 focus:ring-2 focus:ring-forth-500 focus:outline-none transition cursor-pointer">
               <option value="">ดูภาพรวมทั้งบริษัท</option>
             </select>
           </div>
 
-          <!-- API Live Indicator -->
           <div class="flex items-center space-x-1.5 bg-emerald-50/80 border border-emerald-200/80 px-3 py-1.5 rounded-full shrink-0">
             <span id="api-status-dot" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             <div class="text-[10px] leading-tight font-heading">
@@ -173,7 +170,7 @@
           </div>
         </div>
 
-        <!-- Card 2 & 3: Paired KPI Cards (Matches Middle-Left Smart Command Cards) -->
+        <!-- Card 2 & 3: Paired KPI Cards -->
         <div class="grid grid-cols-2 gap-4">
           
           <!-- Left KPI Card: Certified Employees -->
@@ -191,12 +188,12 @@
             </div>
           </div>
 
-          <!-- Right KPI Card: Legal / Company Target -->
+          <!-- Right KPI Card: Legal / Company Target (Dynamic from Google Sheet Target_Percentage) -->
           <div class="bg-white/95 backdrop-blur-sm rounded-3xl p-5 border border-white shadow-bento flex flex-col items-center justify-center text-center relative overflow-hidden group hover:border-forth-200 transition">
             <div class="w-11 h-11 rounded-2xl bg-sky-50 text-forth-cyan flex items-center justify-center text-lg mb-3 shadow-inner border border-sky-100 group-hover:scale-105 transition">
               <i class="fa-solid fa-bullseye"></i>
             </div>
-            <span class="text-xs font-medium text-slate-500">เป้าหมายขั้นต่ำ (<span id="kpi-target-pct-badge">≥ 70%</span>)</span>
+            <span class="text-xs font-medium text-slate-500">เป้าหมายขั้นต่ำ (<span id="kpi-target-pct-badge">กำลังโหลด...</span>)</span>
             <div class="mt-1 flex items-baseline justify-center space-x-1">
               <span id="kpi-target-count" class="text-2xl xl:text-3xl font-heading font-bold text-forth-800">0</span>
               <span class="text-xs font-bold text-forth-800">คน</span>
@@ -208,7 +205,7 @@
 
         </div>
 
-        <!-- Card 4: Bottom-Left Smooth Area Chart (Matches Rainfall Area Chart in Smart Command) -->
+        <!-- Card 4: Bottom-Left Smooth Area Chart -->
         <div class="bg-white/95 backdrop-blur-sm rounded-3xl p-5 border border-white shadow-bento space-y-3">
           <div class="flex items-center justify-between">
             <div>
@@ -232,14 +229,13 @@
 
       </div>
 
-      <!-- RIGHT COLUMN (8 Cols): Large Bento Container with Floating Search Bar + Department Bar Chart + Data Table -->
+      <!-- RIGHT COLUMN (8 Cols) -->
       <div class="lg:col-span-8 bg-white/95 backdrop-blur-sm rounded-3xl border border-white shadow-bento overflow-hidden flex flex-col">
         
-        <!-- Top Floating Control Bar (Matches Search Pill + Switch Toggle over Map) -->
+        <!-- Top Floating Control Bar -->
         <div class="p-4 md:p-5 bg-gradient-to-r from-forth-900 via-forth-800 to-forth-700 text-white space-y-3">
           <div class="flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-3">
             
-            <!-- Floating White Pill Search Input -->
             <div class="flex-1 flex items-center bg-white rounded-full p-1 pl-4 shadow-md">
               <i class="fa-solid fa-magnifying-glass text-forth-500 text-xs mr-2.5"></i>
               <input type="text" id="search-input" oninput="applyFilters()" placeholder="ค้นหา (เช่น รหัสพนักงาน, ชื่อ-นามสกุล, แผนก, หลักสูตร)..." class="w-full bg-transparent text-xs text-slate-800 placeholder-slate-400 focus:outline-none">
@@ -248,7 +244,6 @@
               </button>
             </div>
 
-            <!-- Pill Toggle Switch (Matches "แสดงแปลงที่ดิน" Toggle) -->
             <label class="inline-flex items-center justify-between xl:justify-start bg-white/10 hover:bg-white/15 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full cursor-pointer transition select-none shrink-0">
               <span class="text-xs font-heading font-medium text-white mr-3">เฉพาะผู้ผ่านการรับรอง</span>
               <div class="relative inline-flex items-center">
@@ -341,7 +336,6 @@
     <!-- VIEW 2: 60-DAY SUBMISSION CALENDAR VIEW -->
     <div id="bento-calendar-view" class="hidden space-y-5">
       
-      <!-- Legal Banner -->
       <div class="bg-gradient-to-r from-forth-900 via-forth-800 to-forth-700 text-white rounded-3xl p-5 md:p-6 shadow-bento flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div class="space-y-1.5">
           <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-heading font-semibold bg-forth-cyan/20 text-sky-200 border border-forth-cyan/30">
@@ -358,7 +352,6 @@
         </div>
       </div>
 
-      <!-- Deadline Calculator Card -->
       <div class="bg-white/95 backdrop-blur-sm rounded-3xl border border-white shadow-bento p-5 md:p-6 space-y-4">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
           <h3 class="font-heading font-bold text-sm text-forth-900 flex items-center">
@@ -389,7 +382,6 @@
         </div>
       </div>
 
-      <!-- Course Countdown Table -->
       <div class="bg-white/95 backdrop-blur-sm rounded-3xl border border-white shadow-bento overflow-hidden">
         <div class="p-4 md:p-5 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div>
@@ -496,7 +488,7 @@
 
     function parseCleanNumber(val, defaultVal = 0) {
       if (val === undefined || val === null || val === '') return defaultVal;
-      const num = parseFloat(String(val).replace(/,/g, '').trim());
+      const num = parseFloat(String(val).replace(/[%,\s]/g, ''));
       return isNaN(num) ? defaultVal : num;
     }
 
@@ -516,6 +508,43 @@
       return null;
     }
 
+    // ค้นหาข้อมูลจากชีต Company_Target แบบอัตโนมัติไม่ว่า API จะส่งคีย์ชื่อใดมา
+    function extractTargetConfig(data) {
+      if (!data || typeof data !== 'object') return null;
+
+      let targetRows = null;
+      if (Array.isArray(data.companyTarget) && data.companyTarget.length > 0) {
+        targetRows = data.companyTarget;
+      } else if (Array.isArray(data.Company_Target) && data.Company_Target.length > 0) {
+        targetRows = data.Company_Target;
+      } else {
+        for (const key of Object.keys(data)) {
+          const val = data[key];
+          if (Array.isArray(val) && val.length > 0 && typeof val[0] === 'object' && val[0] !== null) {
+            const rowKeys = Object.keys(val[0]).map(k => k.trim().toLowerCase());
+            if (rowKeys.some(rk => rk.includes('target_percent') || rk.includes('total_employee'))) {
+              targetRows = val;
+              break;
+            }
+          }
+        }
+      }
+
+      if (!targetRows || targetRows.length === 0) return null;
+
+      // เลือกแถวที่มีข้อมูลล่าสุด (รองรับกรณีเพิ่มแถวปีถัดไปในอนาคต)
+      const validRows = targetRows.filter(r => r && Object.values(r).some(v => v !== '' && v !== null && v !== undefined));
+      const row = validRows.length > 0 ? validRows[validRows.length - 1] : targetRows[0];
+
+      const normalized = {};
+      Object.keys(row).forEach(k => {
+        const cleanKey = String(k).trim().toLowerCase().replace(/\s+/g, '_');
+        normalized[cleanKey] = row[k];
+      });
+
+      return normalized;
+    }
+
     async function loadData() {
       const icon = document.getElementById("refresh-icon");
       const statusText = document.getElementById("api-status-text");
@@ -527,7 +556,9 @@
       showLoadingState();
 
       try {
-        const res = await fetch(API_URL);
+        const separator = API_URL.includes('?') ? '&' : '?';
+        const freshUrl = `${API_URL}${separator}_nocache=${Date.now()}`;
+        const res = await fetch(freshUrl, { cache: "no-store" });
         const data = await res.json();
         
         rawData = data;
@@ -603,19 +634,49 @@
 
       let totalCompanyEmployees = 0;
       let targetYear = 2027;
-      let targetPercentage = 70;
+      let targetPercentage = 50; // ใช้ 50% เฉพาะกรณีช่องในชีตว่างเปล่าเท่านั้น
       let finalTargetCount = 0;
 
-      if (rawData.companyTarget && rawData.companyTarget.length > 0) {
-        const targetRow = rawData.companyTarget[0];
-        totalCompanyEmployees = parseCleanNumber(targetRow.Total_Employees, 0);
-        if (targetRow.Target_Year) targetYear = targetRow.Target_Year;
-        if (targetRow.Target_Percentage) targetPercentage = parseCleanNumber(targetRow.Target_Percentage, 70);
-        finalTargetCount = parseCleanNumber(targetRow.Mandatory_Target_Count, 0);
+      const targetConfig = extractTargetConfig(rawData);
+
+      if (targetConfig) {
+        totalCompanyEmployees = parseCleanNumber(
+          targetConfig['total_employees'] ?? targetConfig['total_employee'],
+          0
+        );
+
+        if (targetConfig['target_year']) {
+          targetYear = targetConfig['target_year'];
+        }
+
+        // ดึงค่าจากคอลัมน์ target_percentage โดยตรง
+        let rawPct = targetConfig['target_percentage'];
+        if (rawPct === undefined || rawPct === '') {
+          const pctKey = Object.keys(targetConfig).find(k => k.includes('percent'));
+          if (pctKey) rawPct = targetConfig[pctKey];
+        }
+
+        if (rawPct !== undefined && rawPct !== null && String(rawPct).trim() !== '') {
+          let parsedPct = parseCleanNumber(rawPct, NaN);
+          if (!isNaN(parsedPct)) {
+            // รองรับกรณี Google Sheet ฟอร์แมตเซลล์เป็น % แล้วส่งค่าทศนิยมมา เช่น 0.8 -> 80
+            if (parsedPct > 0 && parsedPct <= 1) {
+              parsedPct = Math.round(parsedPct * 10000) / 100;
+            }
+            targetPercentage = parsedPct;
+          }
+        }
+
+        finalTargetCount = parseCleanNumber(
+          targetConfig['mandatory_target_count'] ?? targetConfig['target_count'],
+          0
+        );
       }
 
       if (totalCompanyEmployees <= 0) totalCompanyEmployees = 1183;
-      if (finalTargetCount <= 0) finalTargetCount = Math.ceil(totalCompanyEmployees * (targetPercentage / 100));
+      if (finalTargetCount <= 0) {
+        finalTargetCount = Math.ceil(totalCompanyEmployees * (targetPercentage / 100));
+      }
 
       const approvedEmpSet = new Set();
       (rawData.logs || []).forEach(l => {
@@ -993,10 +1054,7 @@
         if (tab === 'logs') {
           chartSection.classList.remove('hidden');
           statusFilterWrapper.classList.remove('hidden');
-        } else if (tab === 'certs') {
-          chartSection.classList.add('hidden');
-          statusFilterWrapper.classList.add('hidden');
-        } else if (tab === 'employees') {
+        } else {
           chartSection.classList.add('hidden');
           statusFilterWrapper.classList.add('hidden');
         }
